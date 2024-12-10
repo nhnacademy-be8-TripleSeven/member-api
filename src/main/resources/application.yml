@@ -34,3 +34,4 @@ management:
 
 server:
   shutdown: graceful
+
