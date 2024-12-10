@@ -60,10 +60,10 @@ jobs:
           script: |
             docker pull lushlife99/nhn-member:${{ github.sha }}
             if [ "$(docker ps -q --filter "name=member-api-instance-1")" ]; then
-              docker stop $(docker ps -q --filter "name=member-api-instance-1")
-              docker rm $(docker ps -q --filter "name=member-api-instance-1")
+              docker stop member-api-instance-1
+              docker rm member-api-instance-1
             fi
-            docker run -d --name member-api-instance-1 -p 8082:8082 -e SPRING_PROFILES_ACTIVE=instance1 lushlife99/nhn-member:${{ github.sha }}
+            docker run -d --name member-api-instance-1 -p 8082:8080 -e SPRING_PROFILES_ACTIVE=instance1 lushlife99/nhn-member:${{ github.sha }}
 
       - name: Deploy to Second Instance
         uses: appleboy/ssh-action@master
@@ -75,7 +75,7 @@ jobs:
           script: |
             docker pull lushlife99/nhn-member:${{ github.sha }}
             if [ "$(docker ps -q --filter "name=member-api-instance-2")" ]; then
-              docker stop $(docker ps -q --filter "name=member-api-instance-2")
-              docker rm $(docker ps -q --filter "name=member-api-instance-2")
+              docker stop member-api-instance-2
+              docker rm member-api-instance-2
             fi
-            docker run -d --name member-api-instance-2 -p 8083:8083 -e SPRING_PROFILES_ACTIVE=instance2 lushlife99/nhn-member:${{ github.sha }}
+            docker run -d --name member-api-instance-2 -p 8083:8080 -e SPRING_PROFILES_ACTIVE=instance2 lushlife99/nhn-member:${{ github.sha }}
