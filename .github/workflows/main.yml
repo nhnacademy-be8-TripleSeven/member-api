@@ -25,7 +25,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t nhn-book-store-project/member-api:${{ github.sha }} .
+          docker build -t lushlife99/nhn-member:${{ github.sha }} .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -35,7 +35,7 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push nhn-book-store-project/member-api:${{ github.sha }}
+          docker push lushlife99/nhn-member:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,10 +59,10 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            docker pull nhn-book-store-project/member-api:${{ github.sha }}
+            docker pull lushlife99/nhn-member:${{ github.sha }}
             docker stop $(docker ps -q --filter "name=member-api-instance-1")
             docker rm $(docker ps -q --filter "name=member-api-instance-1")
-            docker run -d --name member-api-instance-1 -p 8081:8080 nhn-book-store-project/member-api:${{ github.sha }}
+            docker run -d --name member-api-instance-1 -p 8081:8080 lushlife99/nhn-member:${{ github.sha }}
 
       - name: Deploy to Second Instance
         uses: appleboy/ssh-action@master
@@ -73,7 +73,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            docker pull nhn-book-store-project/member-api:${{ github.sha }}
+            docker pull lushlife99/nhn-member:${{ github.sha }}
             docker stop $(docker ps -q --filter "name=member-api-instance-2")
             docker rm $(docker ps -q --filter "name=member-api-instance-2")
-            docker run -d --name member-api-instance-2 -p 8082:8080 nhn-book-store-project/member-api:${{ github.sha }}
+            docker run -d --name member-api-instance-2 -p 8082:8080 lushlife99/nhn-member:${{ github.sha }}
