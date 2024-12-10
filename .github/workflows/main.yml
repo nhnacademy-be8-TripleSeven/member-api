@@ -57,23 +57,25 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script_stop: true
           script: |
             docker pull lushlife99/nhn-member:${{ github.sha }}
-            docker stop $(docker ps -q --filter "name=member-api-instance-1")
-            docker rm $(docker ps -q --filter "name=member-api-instance-1")
+            if [ "$(docker ps -q --filter "name=member-api-instance-1")" ]; then
+              docker stop $(docker ps -q --filter "name=member-api-instance-1")
+              docker rm $(docker ps -q --filter "name=member-api-instance-1")
+            fi
             docker run -d --name member-api-instance-1 -p 8082:8082 -e SPRING_PROFILES_ACTIVE=instance1 lushlife99/nhn-member:${{ github.sha }}
 
       - name: Deploy to Second Instance
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_IP}}
+          host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script_stop: true
           script: |
             docker pull lushlife99/nhn-member:${{ github.sha }}
-            docker stop $(docker ps -q --filter "name=member-api-instance-2")
-            docker rm $(docker ps -q --filter "name=member-api-instance-2")
+            if [ "$(docker ps -q --filter "name=member-api-instance-2")" ]; then
+              docker stop $(docker ps -q --filter "name=member-api-instance-2")
+              docker rm $(docker ps -q --filter "name=member-api-instance-2")
+            fi
             docker run -d --name member-api-instance-2 -p 8083:8083 -e SPRING_PROFILES_ACTIVE=instance2 lushlife99/nhn-member:${{ github.sha }}
