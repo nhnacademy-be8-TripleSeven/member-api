@@ -1,7 +1,0 @@
-server:
-  port: 8082
-
-eureka:
-  instance:
-    instance-id: member-api
-    hostname: ~~~~

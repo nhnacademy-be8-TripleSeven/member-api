@@ -99,7 +99,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <mainClass>com.example.eurekaserver.EurekaServerApplication</mainClass>
+                    <mainClass>com.example.msamemberapi.MsaMemberApiApplication</mainClass>
                     <layout>JAR</layout>
                 </configuration>
             </plugin>
