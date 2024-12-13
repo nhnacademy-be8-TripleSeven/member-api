@@ -1,0 +1,47 @@
+<configuration>
+    <!-- 공통 설정 -->
+    <property name="APP_KEY" value="nMWnKdBvAFvUW8XL" />
+    <property name="LOG_URL" value="https://api-logncrash.cloud.toast.com/v2/log" />
+
+    <!-- Console Appender (공통) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- LogNCrash Appender (공통) -->
+    <appender name="LOGNCRASH" class="com.toast.java.logncrash.logback.LogNCrashHttpAppender">
+        <appKey>${APP_KEY}</appKey>
+        <url>${LOG_URL}</url>
+        <logSource>BookAPI-Test</logSource>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>{"level": "%level", "message": "%message", "timestamp": "%d{yyyy-MM-dd HH:mm:ss}"}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <!-- 공통 Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGNCRASH" />
+    </root>
+
+    <!-- instance1과 instance2 프로파일 -->
+    <springProfile name="instance1,instance2">
+        <appender name="CUSTOM_LOGGER" class="ch.qos.logback.core.FileAppender">
+            <file>logs/instance.log</file>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="LOGNCRASH" />
+            <appender-ref ref="CUSTOM_LOGGER" />
+        </root>
+    </springProfile>
+</configuration>

@@ -21,3 +21,9 @@ eureka:
   instance:
     instance-id: member-api
     hostname: localhost
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://admin:1234@localhost:8761/eureka/
