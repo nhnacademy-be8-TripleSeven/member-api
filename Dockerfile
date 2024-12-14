@@ -1,10 +1,11 @@
-# 1단계: Maven 빌드 환경
 FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# 소스 코드 복사 및 의존성 설치
+COPY libs /app/libs
+
 COPY pom.xml ./
 
+# JAR 파일을 Maven 로컬 리포지토리에 설치
 RUN mvn install:install-file \
     -Dfile=/app/libs/toast-logncrash-logback-sdk-3.0.5.jar \
     -DgroupId=com.toast.java.logncrash \
@@ -14,16 +15,12 @@ RUN mvn install:install-file \
 
 RUN mvn dependency:go-offline
 
-# 소스 코드 복사 및 빌드
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# 2단계: JRE 실행 환경
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# JAR 파일 복사
 COPY --from=build /app/target/*.jar app.jar
 
-# 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
