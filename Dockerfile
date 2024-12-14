@@ -4,6 +4,14 @@ WORKDIR /app
 
 # 소스 코드 복사 및 의존성 설치
 COPY pom.xml ./
+
+RUN mvn install:install-file \
+    -Dfile=/app/libs/toast-logncrash-logback-sdk-3.0.5.jar \
+    -DgroupId=com.toast.java.logncrash \
+    -DartifactId=logncrash-logback-sdk \
+    -Dversion=3.0.5 \
+    -Dpackaging=jar
+
 RUN mvn dependency:go-offline
 
 # 소스 코드 복사 및 빌드
