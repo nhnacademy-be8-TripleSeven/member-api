@@ -35,3 +35,6 @@ management:
 server:
   shutdown: graceful
 
+logstash:
+  host: 115.94.72.197
+  port: 50000 # Logstash TCP input 포트
