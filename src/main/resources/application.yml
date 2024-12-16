@@ -2,6 +2,17 @@ spring:
   profiles:
     active: dev
 
+  dbcp2:
+    initial-size: 5         # 풀 초기 크기
+    max-total: 20           # 최대 커넥션 수
+    max-idle: 10            # 최대 유휴 커넥션 수
+    min-idle: 5             # 최소 유휴 커넥션 수
+    max-wait-millis: 30000  # 커넥션 풀에서 커넥션을 얻을 때 최대 대기 시간 (밀리초)
+    validation-query: SELECT 1 # 커넥션 유효성 검사 쿼리
+    test-on-borrow: true    # 커넥션 풀에서 커넥션을 빌릴 때 유효성 검사
+    test-while-idle: true   # 유휴 커넥션에 대해 주기적인 유효성 검사
+    time-between-eviction-runs-millis: 30000 # 커넥션 검증 주기
+
   lifecycle:
     timeout-per-shutdown-phase: 30s
   application:
