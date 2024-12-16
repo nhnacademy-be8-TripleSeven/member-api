@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 public class MemberDto {
 
-    private String id;
+    private Long id;
     private List<String> roles;
 
     public MemberDto(Member member) {

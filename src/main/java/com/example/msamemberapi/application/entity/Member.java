@@ -1,9 +1,7 @@
 package com.example.msamemberapi.application.entity;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
+import com.example.msamemberapi.application.enums.Gender;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -20,11 +19,18 @@ import java.util.List;
 @Data
 public class Member {
 
-    @Id
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true, nullable = false)
+    private String loginId;
     private String password;
     @ElementCollection(fetch = FetchType.LAZY) @Builder.Default
     private List<String> roles = new ArrayList<>();
+    private String name;
+    private Date birth;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
 
     public void addRole(String role) {
         roles.add(role);

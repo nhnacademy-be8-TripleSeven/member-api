@@ -24,14 +24,14 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public Member join(JoinRequestDto joinRequestDto) {
 
-        Optional<Member> optionalMember = memberRepository.findById(joinRequestDto.getId());
+        Optional<Member> optionalMember = memberRepository.findByLoginId(joinRequestDto.getLoginId());
         if (optionalMember.isPresent()) {
             throw new IllegalArgumentException();
         }
 
 
         Member member = Member.builder()
-                .id(joinRequestDto.getId())
+                .loginId(joinRequestDto.getLoginId())
                 .password(passwordEncoder.encode(joinRequestDto.getPassword()))
                 .build();
 
@@ -41,14 +41,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberAuthInfo findByMemberId(String memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException());
+    public MemberAuthInfo findByMemberId(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new IllegalArgumentException());
         return new MemberAuthInfo(member);
     }
 
     @Override
     @Transactional
-    public void deleteByMemberId(String memberId) {
+    public void deleteByMemberId(Long memberId) {
         memberRepository.deleteById(memberId);
     }
 }

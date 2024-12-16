@@ -9,6 +9,6 @@ public interface MemberService {
 
     Member join(JoinRequestDto joinRequestDto);
     MemberAuthInfo findByMemberId(String memberId);
-    void deleteByMemberId(String memberId);
+    void deleteByMemberId(Long memberId);
 
 }

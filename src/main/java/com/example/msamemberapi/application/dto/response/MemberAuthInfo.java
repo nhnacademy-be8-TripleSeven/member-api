@@ -11,12 +11,14 @@ import java.util.List;
 @Getter
 public class MemberAuthInfo {
 
-    private String id;
+    private Long id;
+    private String loginId;
     private String password;
     private List<String> roles;
 
     public MemberAuthInfo(Member member) {
         this.id = member.getId();
+        this.loginId = member.getLoginId();
         this.password = member.getPassword();
         this.roles = new ArrayList<>(member.getRoles());
     }

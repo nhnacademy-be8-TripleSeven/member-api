@@ -14,21 +14,22 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/members")
-    public ResponseEntity join(@RequestBody JoinRequestDto joinRequestDto) {
+    public ResponseEntity create(@RequestBody JoinRequestDto joinRequestDto) {
         memberService.join(joinRequestDto);
         return ResponseEntity.ok(null);
     }
 
     @GetMapping("/members")
-    public MemberAuthInfo getMemberAuthInfo(@RequestParam String id) {
-        return memberService.findByMemberId(id);
+    public MemberAuthInfo getMemberAuthInfo(@RequestParam String loginId) {
+        return memberService.findByMemberId(loginId);
     }
 
     @DeleteMapping("/api/members")
-    public ResponseEntity delete(@RequestParam String id) {
-        memberService.deleteByMemberId(id);
+    public ResponseEntity delete(@RequestParam Long memberId) {
+        memberService.deleteByMemberId(memberId);
         return ResponseEntity.ok(null);
     }
+
 
 
 }
