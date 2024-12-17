@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.dto.response;
 
 import com.example.msamemberapi.application.entity.Member;
+import com.example.msamemberapi.application.entity.MemberAccount;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,14 +13,12 @@ import java.util.List;
 public class MemberAuthInfo {
 
     private Long id;
-    private String loginId;
-    private String password;
+    private MemberAccount memberAccount;
     private List<String> roles;
 
     public MemberAuthInfo(Member member) {
         this.id = member.getId();
-        this.loginId = member.getLoginId();
-        this.password = member.getPassword();
+        this.memberAccount = member.getMemberAccount();
         this.roles = new ArrayList<>(member.getRoles());
     }
 }
