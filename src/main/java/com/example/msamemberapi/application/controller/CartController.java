@@ -20,6 +20,19 @@ public class CartController {
      *
      */
 
+    @Operation(summary = "장바구니 조회", description = "장바구니 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "장바구니 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "파라미터 검증에 실패했을 때")
+    })
+    @GetMapping
+    public CartDto getCart(@RequestHeader("X-USER") Long userId,
+                           @CookieValue("GUEST-ID") String guestId
+    ) {
+
+        return null;
+    }
+
     @Operation(summary = "장바구니에 아이템 추가", description = "장바구니에 책과 수량을 저장")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "장바구니에 책을 성공적으로 저장"),

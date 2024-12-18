@@ -4,8 +4,8 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/nhn_member?serverTimezone=UTC&characterEncoding=UTF-8
-    username: chan
-    password: chan1234
+    username: root
+    password: Lushlife99!
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: org.apache.commons.dbcp2.BasicDataSource
 
