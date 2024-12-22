@@ -75,22 +75,38 @@ jobs:
           START_TIME=$(date +%s)
           while : ; do
             RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-1)
-            if [ $? -ne 0 ]; then
-              echo "Error: Unable to reach Eureka server."
+
+            # 응답이 비어 있는지 확인
+            if [ -z "$RESPONSE" ]; then
+              echo "Error: Empty response from Eureka server."
               exit 1
             fi
-            # JSON 파싱을 위해 jq 사용
-            STATUS=$(echo "$RESPONSE" | jq -r '.status')
+
+            # JSON 파싱을 위해 jq 사용, 파싱 오류시 처리
+            STATUS=$(echo "$RESPONSE" | jq -r '.status' 2>/dev/null)
+
+            # jq 파싱이 실패하면 오류 처리
+            if [ $? -ne 0 ]; then
+              echo "Error: Failed to parse JSON response."
+              echo "Response received: $RESPONSE"
+              exit 1
+            fi
+
+            # 상태가 "UP"이면 종료
             if [ "$STATUS" == "UP" ]; then
               echo "First instance is healthy and UP."
               break
             fi
+
+            # 180초 경과 체크
             CURRENT_TIME=$(date +%s)
             ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
             if [ $ELAPSED_TIME -ge 180 ]; then
               echo "First instance is not healthy within 3 minutes. Aborting deployment."
               exit 1
             fi
+
+            # 10초 대기 후 재시도
             sleep 10
           done
 
@@ -114,21 +130,37 @@ jobs:
           START_TIME=$(date +%s)
           while : ; do
             RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-2)
-            if [ $? -ne 0 ]; then
-              echo "Error: Unable to reach Eureka server."
+
+            # 응답이 비어 있는지 확인
+            if [ -z "$RESPONSE" ]; then
+              echo "Error: Empty response from Eureka server."
               exit 1
             fi
-            # JSON 파싱을 위해 jq 사용
-            STATUS=$(echo "$RESPONSE" | jq -r '.status')
+
+            # JSON 파싱을 위해 jq 사용, 파싱 오류시 처리
+            STATUS=$(echo "$RESPONSE" | jq -r '.status' 2>/dev/null)
+
+            # jq 파싱이 실패하면 오류 처리
+            if [ $? -ne 0 ]; then
+              echo "Error: Failed to parse JSON response."
+              echo "Response received: $RESPONSE"
+              exit 1
+            fi
+
+            # 상태가 "UP"이면 종료
             if [ "$STATUS" == "UP" ]; then
               echo "Second instance is healthy and UP."
               break
             fi
+
+            # 180초 경과 체크
             CURRENT_TIME=$(date +%s)
             ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
             if [ $ELAPSED_TIME -ge 180 ]; then
               echo "Second instance is not healthy within 3 minutes. Aborting deployment."
               exit 1
             fi
+
+            # 10초 대기 후 재시도
             sleep 10
           done
