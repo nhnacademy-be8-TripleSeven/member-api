@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq xmllint
+          sudo apt-get install -y libxml2-utils
 
       - name: Deploy to First Instance
         uses: appleboy/ssh-action@master
