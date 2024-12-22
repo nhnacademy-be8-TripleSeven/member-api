@@ -50,10 +50,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Install jq
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq
+          sudo apt-get install -y jq xmllint
 
       - name: Deploy to First Instance
         uses: appleboy/ssh-action@master
@@ -74,7 +74,7 @@ jobs:
         run: |
           START_TIME=$(date +%s)
           while : ; do
-            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-1)
+            RESPONSE=$(curl -s -H "Accept: application/xml" http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-1)
 
             # 응답이 비어 있는지 확인
             if [ -z "$RESPONSE" ]; then
@@ -82,12 +82,12 @@ jobs:
               exit 1
             fi
 
-            # JSON 파싱을 위해 jq 사용, 파싱 오류시 처리
-            STATUS=$(echo "$RESPONSE" | jq -r '.status' 2>/dev/null)
+            # XML 파싱을 위해 xmllint 사용
+            STATUS=$(echo "$RESPONSE" | xmllint --xpath "string(//status)" - 2>/dev/null)
 
-            # jq 파싱이 실패하면 오류 처리
+            # xmllint 파싱이 실패하면 오류 처리
             if [ $? -ne 0 ]; then
-              echo "Error: Failed to parse JSON response."
+              echo "Error: Failed to parse XML response."
               echo "Response received: $RESPONSE"
               exit 1
             fi
@@ -129,7 +129,7 @@ jobs:
         run: |
           START_TIME=$(date +%s)
           while : ; do
-            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-2)
+            RESPONSE=$(curl -s -H "Accept: application/xml" http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-2)
 
             # 응답이 비어 있는지 확인
             if [ -z "$RESPONSE" ]; then
@@ -137,12 +137,12 @@ jobs:
               exit 1
             fi
 
-            # JSON 파싱을 위해 jq 사용, 파싱 오류시 처리
-            STATUS=$(echo "$RESPONSE" | jq -r '.status' 2>/dev/null)
+            # XML 파싱을 위해 xmllint 사용
+            STATUS=$(echo "$RESPONSE" | xmllint --xpath "string(//status)" - 2>/dev/null)
 
-            # jq 파싱이 실패하면 오류 처리
+            # xmllint 파싱이 실패하면 오류 처리
             if [ $? -ne 0 ]; then
-              echo "Error: Failed to parse JSON response."
+              echo "Error: Failed to parse XML response."
               echo "Response received: $RESPONSE"
               exit 1
             fi
