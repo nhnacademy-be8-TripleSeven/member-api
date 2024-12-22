@@ -69,7 +69,7 @@ jobs:
         run: |
           START_TIME=$(date +%s)
           while : ; do
-            RESPONSE=$(curl -s http://nhn24.store/eureka/eureka/instances/MEMBER-API-1)
+            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-1)
             echo "$RESPONSE" | grep -q '"status":"UP"'
             if [ $? -eq 0 ]; then
               echo "First instance is healthy and UP."
@@ -103,7 +103,7 @@ jobs:
         run: |
           START_TIME=$(date +%s)
           while : ; do
-            RESPONSE=$(curl -s http://nhn24.store/eureka/eureka/instances/MEMBER-API-2)
+            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-2)
             echo "$RESPONSE" | grep -q '"status":"UP"'
             if [ $? -eq 0 ]; then
               echo "Second instance is healthy and UP."
