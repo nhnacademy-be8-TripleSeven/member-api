@@ -55,70 +55,45 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Deploy to First Instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            docker pull lushlife99/nhn-member:${{ github.sha }}
-            if [ "$(docker ps -aq --filter "name=member-api-instance-1")" ]; then
-              docker stop member-api-instance-1 || true
-              docker rm -f member-api-instance-1 || true
-            fi
-            docker run --name member-api-instance-1 --network nhn-book-store-network -p 8082:8082 -e SPRING_PROFILES_ACTIVE=instance1 -d lushlife99/nhn-member:${{ github.sha }}
-
-      - name: Check First Instance via Eureka
+      - name: Deploy to Instance
         run: |
-          START_TIME=$(date +%s)
-          while : ; do
-            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-1)
-            STATUS=$(echo "$RESPONSE" | jq -r '.status')
-            if [ "$STATUS" == "UP" ]; then
-              echo "First instance is healthy and UP."
-              break
+          deploy_instance() {
+            INSTANCE_NAME=$1
+            PORT=$2
+            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/${INSTANCE_NAME})
+            STATUS=$(echo "$RESPONSE" | xmllint --xpath "string(//status)" -)
+
+            # Deploy Docker container
+            docker pull lushlife99/nhn-member:${{ github.sha }}
+            if [ "$(docker ps -aq --filter "name=${INSTANCE_NAME}")" ]; then
+              docker stop ${INSTANCE_NAME} || true
+              docker rm -f ${INSTANCE_NAME} || true
             fi
-            CURRENT_TIME=$(date +%s)
-            ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
-            if [ $ELAPSED_TIME -ge 180 ]; then
-              echo "First instance is not healthy within 3 minutes. Aborting deployment."
-              exit 1
-            fi
-            sleep 10
-          done
+            docker run --name ${INSTANCE_NAME} --network nhn-book-store-network -p ${PORT}:${PORT} -e SPRING_PROFILES_ACTIVE=${INSTANCE_NAME} -d lushlife99/nhn-member:${{ github.sha }}
+          
+            # Check instance health
+            START_TIME=$(date +%s)
+            while : ; do
+              RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/${INSTANCE_NAME})
+              STATUS=$(echo "$RESPONSE" | jq -r '.status')
+              if [ "$STATUS" == "UP" ]; then
+                echo "${INSTANCE_NAME} is healthy and UP."
+                break
+              fi
+              CURRENT_TIME=$(date +%s)
+              ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
+              if [ $ELAPSED_TIME -ge 180 ]; then
+                echo "${INSTANCE_NAME} is not healthy within 3 minutes. Aborting deployment."
+                exit 1
+              fi
+              sleep 10
+            done
+          }
+
+      - name: Deploy to First Instance
+        run: |
+          deploy_instance "member-api-1" 8082
 
       - name: Deploy to Second Instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_ID }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            docker pull lushlife99/nhn-member:${{ github.sha }}
-            if [ "$(docker ps -aq --filter "name=member-api-instance-2")" ]; then
-              docker stop member-api-instance-2 || true
-              docker rm -f member-api-instance-2 || true
-            fi
-            docker run --name member-api-instance-2 --network nhn-book-store-network -p 8083:8083 -e SPRING_PROFILES_ACTIVE=instance2 -d lushlife99/nhn-member:${{ github.sha }}
-
-      - name: Check Second Instance via Eureka
         run: |
-          START_TIME=$(date +%s)
-          while : ; do
-            RESPONSE=$(curl -s http://${{ secrets.EUREKA_USERNAME }}:${{ secrets.EUREKA_PASSWORD }}@nhn24.store/eureka/eureka/instances/member-api-2)
-            STATUS=$(echo "$RESPONSE" | jq -r '.status')
-            if [ "$STATUS" == "UP" ]; then
-              echo "Second instance is healthy and UP."
-              break
-            fi
-            CURRENT_TIME=$(date +%s)
-            ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
-            if [ $ELAPSED_TIME -ge 180 ]; then
-              echo "Second instance is not healthy within 3 minutes. Aborting deployment."
-              exit 1
-            fi
-            sleep 10
-          done
+          deploy_instance "member-api-2" 8083
