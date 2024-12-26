@@ -20,6 +20,7 @@ spring:
 
 eureka:
   instance:
+    health-check-url: /actuator/health
     instance-id: member-api
     hostname: localhost
     prefer-ip-address: true
