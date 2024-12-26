@@ -39,16 +39,6 @@ public class DataSourceConfig {
         dataSource.setUsername(databaseCredentials.getUsername());
         dataSource.setPassword(databaseCredentials.getPassword());
 
-        System.out.println("url = " + url);
-        System.out.println("username = " + username);
-        System.out.println("password = " + password);
-
-        // 톰캣 기본 설정과 일치시키는 Connection Pool 설정
-        dataSource.setInitialSize(100);        // 초기 커넥션 개수
-        dataSource.setMaxTotal(100);         // 최대 커넥션 개수
-        dataSource.setMinIdle(100);            // 최소 유휴 커넥션 개수
-        dataSource.setMaxIdle(100);          // 최대 유휴 커넥션 개수
-
         // Connection 유효성 검사를 위한 설정
         dataSource.setTestOnBorrow(true);    // 커넥션 획득 전 테스트 (톰캣 기본값: true)
         dataSource.setValidationQuery("SELECT 1"); // 커넥션 유효성 검사 쿼리
