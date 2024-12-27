@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AccountController {
             @ApiResponse(responseCode = "409", description = "이미 존재하는 로그인아이디, 핸드폰번호, 이메일")
     })
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody JoinRequestDto joinRequestDto) {
+    public ResponseEntity<Void> create(@Valid @RequestBody JoinRequestDto joinRequestDto) {
         memberService.join(joinRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
