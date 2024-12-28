@@ -1,22 +1,15 @@
 package com.example.msamemberapi.application.controller;
 
-import com.example.msamemberapi.application.dto.request.JoinRequestDto;
-import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
-import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.web.exchanges.HttpExchange;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 
 @Tag(name = "Member", description = "회원 Api")
 @RestController

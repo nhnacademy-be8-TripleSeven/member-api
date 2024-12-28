@@ -3,6 +3,7 @@ package com.example.msamemberapi.application.controller;
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
+import com.example.msamemberapi.application.service.EmailVerifyService;
 import com.example.msamemberapi.application.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final MemberService memberService;
+    private final EmailVerifyService emailVerifyService;
 
     @Operation(summary = "멤버 생성", description = "회원가입 시 받은 정보로 멤버 생성")
     @ApiResponses(value = {
@@ -30,6 +32,7 @@ public class AccountController {
     })
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody JoinRequestDto joinRequestDto) {
+        emailVerifyService.validateEmailIsVerified(joinRequestDto.getEmail());
         memberService.join(joinRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -53,7 +56,7 @@ public class AccountController {
 
     @GetMapping("/account/phone")
     public MemberAccountInfo getMemberAccountFromPhoneNumber(@RequestParam String phoneNumber) {
-        return null;
+        return memberService.getMemberAccountByPhoneNumber(phoneNumber);
     }
 
     @Operation(summary = "멤버 계정 정보 조회", description = "이메일을 통해 멤버 계정 정보를 조회")

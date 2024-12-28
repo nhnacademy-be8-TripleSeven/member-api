@@ -14,6 +14,7 @@ import org.apache.hc.core5.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.io.InputStream;
 
 
-@Service
+@Component
 public class SecureKeyManagerService {
 
     @Value("${secret.url}")
