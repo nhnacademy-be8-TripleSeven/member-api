@@ -7,6 +7,7 @@ import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.entity.MemberGradeHistory;
+import com.example.msamemberapi.application.entity.User;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
@@ -36,7 +37,8 @@ public class MemberServiceImpl implements MemberService {
 
         validateUniqueMember(joinRequestDto);
         MemberAccount memberAccount = createMemberAccount(joinRequestDto);
-        Member member = createMember(joinRequestDto, memberAccount);
+        User user = createUser(joinRequestDto);
+        Member member = createMember(joinRequestDto, memberAccount, user);
         return new MemberDto(memberRepository.save(member));
     }
 
@@ -64,20 +66,19 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(readOnly = true)
     public MemberAccountInfo getMemberAccountByPhoneNumber(String phoneNumber) {
-        Member member = memberRepository.findByPhoneNumber(phoneNumber)
+        Member member = memberRepository.findByUserPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new CustomException(ErrorCode.PHONE_NOT_FOUND));
 
         return new MemberAccountInfo(member.getMemberAccount());
     }
 
-    private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount) {
+    private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
         Member member = Member.builder()
                 .memberAccount(memberAccount)
+                .user(user)
                 .birth(joinRequestDto.getBirth())
                 .gender(joinRequestDto.getGender())
                 .email(joinRequestDto.getEmail())
-                .phoneNumber(joinRequestDto.getPhoneNumber())
-                .name(joinRequestDto.getName())
                 .gradeHistories(new ArrayList<>())
                 .build();
 
@@ -86,6 +87,13 @@ public class MemberServiceImpl implements MemberService {
         member.addRole(MemberRole.USER);
 
         return member;
+    }
+
+    private User createUser(JoinRequestDto joinRequestDto) {
+        return User.builder()
+                .name(joinRequestDto.getName())
+                .phoneNumber(joinRequestDto.getPhoneNumber())
+                .build();
     }
 
     private MemberGradeHistory createMemberGradeHistory(Member member) {
@@ -112,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
             throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
         }
 
-        if (memberRepository.existsByPhoneNumber(joinRequestDto.getPhoneNumber())) {
+        if (memberRepository.existsByUserPhoneNumber(joinRequestDto.getPhoneNumber())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_PHONE);
         }
     }
