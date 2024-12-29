@@ -77,7 +77,7 @@ public class EmailVerifyServiceImpl implements EmailVerifyService {
         return String.format("%06d", random.nextInt(VERIFICATION_CODE_RANGE));
     }
 
-    private void sendEmail(String recipientEmail, String subject, String content) {
+    protected void sendEmail(String recipientEmail, String subject, String content) {
         try {
             Message message = new MimeMessage(EMAIL_SESSION);
             message.setFrom(new InternetAddress(USERNAME));
@@ -89,7 +89,7 @@ public class EmailVerifyServiceImpl implements EmailVerifyService {
         }  catch (AddressException addressEx) {
             throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
         } catch (MessagingException messagingEx) {
-            log.error("Mail Message Error : {}", messagingEx.getCause());
+            log.error("Mail Message Error : {}", messagingEx.getMessage());
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
