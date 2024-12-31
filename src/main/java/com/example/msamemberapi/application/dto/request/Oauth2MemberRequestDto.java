@@ -16,7 +16,7 @@ import lombok.Getter;
 public class Oauth2MemberRequestDto {
 
     @NotEmpty
-    private int idNo;
+    private String idNo;
     @NotEmpty
     private String email;
     @NotEmpty
@@ -35,7 +35,7 @@ public class Oauth2MemberRequestDto {
                 .build();
 
         MemberAccount memberAccount = MemberAccount.builder()
-                .id(String.valueOf(idNo))
+                .id(idNo)
                 .accountType(AccountType.PAYCO)
                 .build();
 
