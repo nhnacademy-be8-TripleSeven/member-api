@@ -2,6 +2,7 @@ package com.example.msamemberapi.application.controller;
 
 import com.example.msamemberapi.application.dto.request.AddressRequestDto;
 import com.example.msamemberapi.application.dto.response.AddressResponseDto;
+import com.example.msamemberapi.application.dto.response.KakaoAddressResponseDto;
 import com.example.msamemberapi.application.service.AddressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,5 +69,16 @@ public class AddressController {
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
         addressService.deleteAddress(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "도로명 주소 검색", description = "카카오 API를 통해 도로명 주소 검색")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<List<KakaoAddressResponseDto>> searchAddress(@RequestParam String keyword) {
+        List<KakaoAddressResponseDto> results = addressService.searchRoadAddress(keyword);
+        return ResponseEntity.ok(results);
     }
 }

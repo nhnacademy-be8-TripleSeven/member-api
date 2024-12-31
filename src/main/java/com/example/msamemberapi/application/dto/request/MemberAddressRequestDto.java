@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class MemberAddressRequestDto {
+
     @NotNull
-    @NotBlank(message = "별칭은 필수 입력 항목입니다.")
+    @NotBlank(message = "별칭을 적어주세요.")
     @Size(max = 50, message = "별칭은 최대 50자까지 가능합니다.")
     private String alias;
 
@@ -28,4 +29,7 @@ public class MemberAddressRequestDto {
     @NotNull
     @NotBlank(message = "상세 주소는 필수 입력 항목입니다.")
     private String detail;
+
+    @NotNull
+    private Boolean isDefault; // 기본 주소 확인
 }

@@ -1,6 +1,5 @@
 package com.example.msamemberapi.application.service.impl;
 
-
 import com.example.msamemberapi.application.dto.request.MemberAddressRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAddressResponseDto;
 import com.example.msamemberapi.application.entity.Member;
@@ -31,9 +30,10 @@ public class MemberAddressServiceImpl implements MemberAddressService {
                 .map(memberAddress -> new MemberAddressResponseDto(
                         memberAddress.getId(),
                         memberAddress.getAlias(),
-                        "상세 주소 정보", // 값-->  API
-                        "도로명 주소 정보", // 값-->  API
-                        "우편번호" //  값-->  API
+                        "상세 주소 정보", // 값-->API
+                        "도로명 주소 정보", // 값-->API
+                        "우편번호",        // 값-->API
+                        memberAddress.getIsDefault()
                 ))
                 .collect(Collectors.toList());
     }
@@ -41,7 +41,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     @Override
     @Transactional
     public MemberAddressResponseDto addAddressToMember(Long memberId, MemberAddressRequestDto requestDto) {
-        // 회원 존재 여부
+        // 회원 존재 여부 확인
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
@@ -50,16 +50,19 @@ public class MemberAddressServiceImpl implements MemberAddressService {
             throw new IllegalStateException("주소는 최대 10개까지만 등록할 수 있습니다.");
         }
 
-        // 도로명주소 검증
-        if (!isRoadAddress(requestDto.getRoadAddress())) {
-            throw new IllegalArgumentException("도로명주소만 등록 가능합니다.");
+        // 기존 기본 주소 해제 (기본 주소 설정 요청 시)
+        if (requestDto.getIsDefault()) {
+            List<MemberAddress> existingAddresses = memberAddressRepository.findByMemberId(memberId);
+            existingAddresses.forEach(address -> address.setDefault(false));
+            memberAddressRepository.saveAll(existingAddresses);
         }
 
         // MemberAddress 생성 및 저장
         MemberAddress memberAddress = MemberAddress.builder()
                 .member(member)
-                .addressId(null) // API 호출 시 데이터 가져오기
+                .addressId(null) // 실제 Address ID
                 .alias(requestDto.getAlias())
+                .isDefault(requestDto.getIsDefault())
                 .build();
 
         memberAddressRepository.save(memberAddress);
@@ -69,7 +72,8 @@ public class MemberAddressServiceImpl implements MemberAddressService {
                 requestDto.getAlias(),
                 requestDto.getDetail(),
                 requestDto.getRoadAddress(),
-                requestDto.getPostalCode()
+                requestDto.getPostalCode(),
+                requestDto.getIsDefault()
         );
     }
 
@@ -82,8 +86,20 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         memberAddressRepository.delete(memberAddress);
     }
 
-    private boolean isRoadAddress(String address) {
-        //검증하려고 추가함
-        return address.contains("로") || address.contains("길");
+    @Override
+    @Transactional
+    public void updateAliasAndDefault(Long memberAddressId, String alias, Boolean isDefault) {
+        MemberAddress memberAddress = memberAddressRepository.findById(memberAddressId)
+                .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
+
+        memberAddress.updateAlias(alias);
+
+        if (isDefault != null && isDefault) {
+            List<MemberAddress> existingAddresses = memberAddressRepository.findByMemberId(memberAddress.getMember().getId());
+            existingAddresses.forEach(address -> address.setDefault(false));
+            memberAddress.setDefault(true);
+        }
+
+        memberAddressRepository.save(memberAddress);
     }
 }

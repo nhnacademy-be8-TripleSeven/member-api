@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,23 @@ public class MemberAddressController {
     public ResponseEntity<Void> removeAddressFromMember(@PathVariable Long memberId, @PathVariable Long addressId) {
         memberAddressService.removeAddressFromMember(memberId, addressId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{addressId}")
+    @Operation(summary = "주소 별칭, 기본 주소 수정", description = "특정 주소의 별칭을 수정하고 기본 주소 여부를 설정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주소 수정 성공"),
+            @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    public ResponseEntity<Void> updateAliasAndDefault(
+            @PathVariable Long memberId,
+            @PathVariable Long addressId,
+            @RequestBody Map<String, Object> request) {
+        String alias = (String) request.get("alias");
+        Boolean isDefault = (Boolean) request.get("isDefault");
+
+        memberAddressService.updateAlias(addressId, alias, isDefault);
+        return ResponseEntity.ok().build();
     }
 }

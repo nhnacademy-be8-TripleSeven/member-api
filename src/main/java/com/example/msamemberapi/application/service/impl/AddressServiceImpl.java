@@ -28,18 +28,17 @@ public class AddressServiceImpl implements AddressService {
                         address.getDetail(),
                         address.getAlias()
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional
     public AddressResponseDto createAddress(AddressRequestDto requestDto) {
-        Address savedAddress = addressRepository.save(Address.builder()
+        var savedAddress = addressRepository.save(Address.builder()
                 .roadAddress(requestDto.getRoadAddress())
-                .detail(requestDto.getDetail())
+                .detail(requestDto.getDetailAddress())
                 .alias(requestDto.getAlias())
                 .build());
-
         return new AddressResponseDto(
                 savedAddress.getId(),
                 savedAddress.getRoadAddress(),
@@ -51,22 +50,20 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponseDto updateAddress(Long id, AddressRequestDto requestDto) {
-        Address address = addressRepository.findById(id)
+        var address = addressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주소를 찾을 수 없습니다."));
 
         address.updateDetails(
                 requestDto.getRoadAddress(),
-                requestDto.getDetail(),
+                requestDto.getDetailAddress(),
                 requestDto.getAlias()
         );
 
-        Address updatedAddress = addressRepository.save(address);
-
         return new AddressResponseDto(
-                updatedAddress.getId(),
-                updatedAddress.getRoadAddress(),
-                updatedAddress.getDetail(),
-                updatedAddress.getAlias()
+                address.getId(),
+                address.getRoadAddress(),
+                address.getDetail(),
+                address.getAlias()
         );
     }
 

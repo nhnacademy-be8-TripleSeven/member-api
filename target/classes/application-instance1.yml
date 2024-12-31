@@ -1,0 +1,28 @@
+server:
+  port: 8082
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+
+eureka:
+  instance:
+    instance-id: member-api-1
+    hostname: localhost
+
+secret:
+  url: https://api-keymanager.nhncloudservice.com
+  appKey: qTQNj7LyHhdAazH3
+  keys:
+    db:
+      url: 50cec4261dc94323ab8e3d6a44412ab4
+      username: aaf3edf33ca847e3ac72361613ee1784
+      password: 23b0d6961e204d59a645d662f6843f25
+  keyStoreFilePath: triple-seven.p12
+  password: nhn24

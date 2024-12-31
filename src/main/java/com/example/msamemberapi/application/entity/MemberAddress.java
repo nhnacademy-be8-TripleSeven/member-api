@@ -25,14 +25,17 @@ public class MemberAddress {
     @Column(name = "address_id", nullable = false)
     private Long addressId;
 
-    @Column(name = "alias", length = 50, nullable = false) // 별칭 추가
+    @Column(name = "alias", length = 50, nullable = false)
     private String alias;
 
+    @Column(name = "is_default", nullable = false)
+    private Boolean isDefault; //기본 주소
 
-    public static class MemberAddressBuilder {
-        public MemberAddressBuilder addressId(Long addressId) {
-            this.addressId = addressId;
-            return this;
-        }
+    public void updateAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public void setDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
 }

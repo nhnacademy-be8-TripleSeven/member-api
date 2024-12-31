@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class MemberAddressResponseDto {
+
     private Long id;
     private String alias;
     private String detail;
     private String roadAddress;
     private String postalCode;
+    private Boolean isDefault;
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -14,22 +15,22 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Address {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @Column(nullable = false, length = 255)
-        private String roadAddress;
+    @Column(nullable = false, length = 255)
+    private String roadAddress;
 
-        @Column(nullable = false, length = 255)
-        private String detail;
+    @Column(nullable = false, length = 255)
+    private String detail;
 
-        @Column(nullable = false, length = 50)
-        private String alias;
+    @Column(nullable = false, length = 50)
+    private String alias;
 
-        public void updateDetails(String roadAddress, String detail, String alias) {
-            this.roadAddress = roadAddress;
-            this.detail = detail;
-            this.alias = alias;
-        }
+    public void updateDetails(String roadAddress, String detail, String alias) {
+        this.roadAddress = roadAddress;
+        this.detail = detail;
+        this.alias = alias;
     }
+}

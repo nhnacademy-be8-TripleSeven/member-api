@@ -9,4 +9,5 @@ public interface MemberAddressService {
     List<MemberAddressResponseDto> getAddressesByMemberId(Long memberId);
     MemberAddressResponseDto addAddressToMember(Long memberId, MemberAddressRequestDto requestDto);
     void removeAddressFromMember(Long memberId, Long addressId);
+    void updateAliasAndDefault(Long memberAddressId, String alias, Boolean isDefault);
 }
