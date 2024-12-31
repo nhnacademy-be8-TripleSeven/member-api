@@ -10,9 +10,13 @@ import com.example.msamemberapi.application.enums.MemberRole;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Getter
+@ToString
+@Slf4j
 public class Oauth2MemberRequestDto {
 
     @NotEmpty
@@ -29,6 +33,7 @@ public class Oauth2MemberRequestDto {
 
     public Member toPaycoMemberEntity() {
 
+        log.info("{}", this.toString());
         User user = User.builder()
                 .phoneNumber(mobile)
                 .name(name)
