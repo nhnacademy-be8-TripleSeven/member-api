@@ -35,12 +35,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL) // Cascade 옵션 확인
     private User user;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
