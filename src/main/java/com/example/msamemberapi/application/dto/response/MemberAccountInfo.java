@@ -1,6 +1,5 @@
 package com.example.msamemberapi.application.dto.response;
 
-import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,8 @@
 package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.dto.request.Oauth2MemberRequestDto;
+import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
+import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
@@ -18,7 +20,7 @@ public class PaycoMemberService implements Oauth2MemberService {
 
     @Override
     @Transactional
-    public void saveMemberDetail(Oauth2MemberRequestDto memberRequestDto) {
+    public MemberAccountInfo saveMemberDetail(Oauth2MemberRequestDto memberRequestDto) {
 
         if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
@@ -28,7 +30,8 @@ public class PaycoMemberService implements Oauth2MemberService {
             throw new CustomException(ErrorCode.ALREADY_EXIST_PHONE);
         }
 
-        memberRepository.save(memberRequestDto.toPaycoMemberEntity());
+        Member member = memberRepository.save(memberRequestDto.toPaycoMemberEntity());
+        return new MemberAccountInfo(member.getMemberAccount());
     }
 
 }
