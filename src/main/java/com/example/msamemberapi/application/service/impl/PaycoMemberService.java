@@ -21,15 +21,6 @@ public class PaycoMemberService implements Oauth2MemberService {
     @Override
     @Transactional
     public MemberAccountInfo saveMemberDetail(Oauth2MemberRequestDto memberRequestDto) {
-
-        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
-        }
-
-        if (memberRepository.existsByUserPhoneNumber(memberRequestDto.getMobile())) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_PHONE);
-        }
-
         Member member = memberRepository.save(memberRequestDto.toPaycoMemberEntity());
         return new MemberAccountInfo(member.getMemberAccount());
     }

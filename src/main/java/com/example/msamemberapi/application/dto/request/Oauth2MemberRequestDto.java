@@ -33,13 +33,10 @@ public class Oauth2MemberRequestDto {
 
     public Member toPaycoMemberEntity() {
 
-        log.info("{}", this.toString());
         User user = User.builder()
                 .phoneNumber(mobile)
                 .name(name)
                 .build();
-
-        log.info("user phoneNumber : {}", user.getPhoneNumber());
 
         MemberAccount memberAccount = MemberAccount.builder()
                 .id(idNo)
@@ -55,8 +52,6 @@ public class Oauth2MemberRequestDto {
                 .build();
 
         member.addRole(MemberRole.PAYCO);
-
-        log.info("member phonenumber : {}" , member.getUser().getPhoneNumber());
         return member;
     }
 }
