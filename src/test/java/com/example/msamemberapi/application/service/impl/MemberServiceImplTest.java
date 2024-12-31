@@ -47,7 +47,6 @@ class MemberServiceImplTest {
 
         when(memberRepository.existsByMemberAccount_Id(joinRequestDto.getLoginId())).thenReturn(false);
         when(memberRepository.existsByEmail(joinRequestDto.getEmail())).thenReturn(false);
-        when(memberRepository.existsByPhoneNumber(joinRequestDto.getPhoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(joinRequestDto.getPassword())).thenReturn("encodedPassword");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
