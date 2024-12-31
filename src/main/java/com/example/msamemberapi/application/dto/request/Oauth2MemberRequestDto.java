@@ -39,6 +39,8 @@ public class Oauth2MemberRequestDto {
                 .name(name)
                 .build();
 
+        log.info("user phoneNumber : {}", user.getPhoneNumber());
+
         MemberAccount memberAccount = MemberAccount.builder()
                 .id(idNo)
                 .accountType(AccountType.PAYCO)
@@ -54,6 +56,7 @@ public class Oauth2MemberRequestDto {
 
         member.addRole(MemberRole.PAYCO);
 
+        log.info("member phonenumber : {}" , member.getUser().getPhoneNumber());
         return member;
     }
 }
