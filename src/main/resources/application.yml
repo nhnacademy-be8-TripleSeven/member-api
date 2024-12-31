@@ -7,6 +7,7 @@ spring:
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
 
+
   lifecycle:
     timeout-per-shutdown-phase: 30s
   application:

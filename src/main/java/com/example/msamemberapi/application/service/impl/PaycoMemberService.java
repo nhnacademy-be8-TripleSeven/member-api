@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,12 @@ public class PaycoMemberService implements Oauth2MemberService {
     @Override
     @Transactional
     public MemberAccountInfo saveMemberDetail(Oauth2MemberRequestDto memberRequestDto) {
+
+        Optional<Member> optionalMember = memberRepository.findByMemberAccount_Id(memberRequestDto.getIdNo());
+        if (!optionalMember.isPresent()) {
+            new MemberAccountInfo(optionalMember.get().getMemberAccount());
+        }
+
         Member member = memberRepository.save(memberRequestDto.toPaycoMemberEntity());
         return new MemberAccountInfo(member.getMemberAccount());
     }
