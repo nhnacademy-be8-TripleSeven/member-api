@@ -8,6 +8,7 @@ import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.entity.MemberGradeHistory;
 import com.example.msamemberapi.application.entity.User;
+import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
@@ -107,6 +108,7 @@ public class MemberServiceImpl implements MemberService {
         return MemberAccount.builder()
                 .id(joinRequestDto.getLoginId())
                 .password(passwordEncoder.encode(joinRequestDto.getPassword()))
+                .accountType(AccountType.REGISTERED)
                 .build();
     }
 

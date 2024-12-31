@@ -1,6 +1,9 @@
 package com.example.msamemberapi.application.entity;
 
+import com.example.msamemberapi.application.enums.AccountType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +19,8 @@ public class MemberAccount {
 
     @Id
     private String id;
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
     private String password;
 
 }

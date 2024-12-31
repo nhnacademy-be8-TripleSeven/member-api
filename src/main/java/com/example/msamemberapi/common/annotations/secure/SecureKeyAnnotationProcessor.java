@@ -1,6 +1,6 @@
 package com.example.msamemberapi.common.annotations.secure;
 
-import com.example.msamemberapi.application.service.impl.SecureKeyManagerService;
+import com.example.msamemberapi.application.service.skm.SecureKeyManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.env.Environment;

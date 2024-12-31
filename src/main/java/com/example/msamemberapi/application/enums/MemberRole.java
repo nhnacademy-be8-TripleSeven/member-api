@@ -4,6 +4,7 @@ package com.example.msamemberapi.application.enums;
 public enum MemberRole {
 
     USER,
+    PAYCO,
 
     ;
 

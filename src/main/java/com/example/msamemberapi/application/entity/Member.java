@@ -41,6 +41,7 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
 
