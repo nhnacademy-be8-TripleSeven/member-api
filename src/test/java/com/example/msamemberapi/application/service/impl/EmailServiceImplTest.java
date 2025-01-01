@@ -19,10 +19,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class EmailVerifyServiceImplTest {
+class EmailServiceImplTest {
 
     @InjectMocks
-    private EmailVerifyServiceImpl emailVerifyService;
+    private EmailServiceImpl emailVerifyService;
 
     @Mock
     private RedisTemplate<String, String> redisTemplate;

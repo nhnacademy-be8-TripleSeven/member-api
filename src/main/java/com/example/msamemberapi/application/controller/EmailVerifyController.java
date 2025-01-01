@@ -1,6 +1,6 @@
 package com.example.msamemberapi.application.controller;
 
-import com.example.msamemberapi.application.service.EmailVerifyService;
+import com.example.msamemberapi.application.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class EmailVerifyController {
 
-    private final EmailVerifyService emailVerifyService;
+    private final EmailService emailService;
 
     @Operation(summary = "이메일 인증번호 전송", description = "회원가입 시 작성한 이메일에 인증요청 보내기")
     @ApiResponses(value = {
@@ -27,7 +27,7 @@ public class EmailVerifyController {
     })
     @PostMapping("/{email}")
     public ResponseEntity<Void> sendVerificationCode(@PathVariable String email) {
-        emailVerifyService.sendVerifyCode(email);
+        emailService.sendVerifyCode(email);
         return ResponseEntity.ok().build();
     }
 
@@ -39,7 +39,7 @@ public class EmailVerifyController {
     })
     @PostMapping("/{email}/{verificationCode}")
     public ResponseEntity<Void> verify(@PathVariable String email, @PathVariable String verificationCode) {
-        emailVerifyService.verify(email, verificationCode);
+        emailService.verify(email, verificationCode);
         return ResponseEntity.ok().build();
     }
 }
