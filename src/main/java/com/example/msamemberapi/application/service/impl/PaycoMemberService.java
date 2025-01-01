@@ -25,7 +25,7 @@ public class PaycoMemberService implements Oauth2MemberService {
     public MemberAccountInfo saveMemberDetail(Oauth2MemberRequestDto memberRequestDto) {
 
         Optional<Member> optionalMember = memberRepository.findByMemberAccount_Id(memberRequestDto.getIdNo());
-        if (!optionalMember.isPresent()) {
+        if (optionalMember.isPresent()) {
             new MemberAccountInfo(optionalMember.get().getMemberAccount());
         }
 
