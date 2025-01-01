@@ -5,6 +5,7 @@ public enum MemberRole {
 
     USER,
     PAYCO,
+    ADMIN,
 
     ;
 
