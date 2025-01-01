@@ -23,4 +23,7 @@ public class MemberAccount {
     private AccountType accountType;
     private String password;
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }

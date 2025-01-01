@@ -2,7 +2,7 @@ package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
-import com.example.msamemberapi.application.service.EmailVerifyService;
+import com.example.msamemberapi.application.service.EmailService;
 import com.example.msamemberapi.common.annotations.secure.SecureKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +21,13 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class EmailVerifyServiceImpl implements EmailVerifyService {
+public class EmailServiceImpl implements EmailService {
 
     private static final int VERIFY_CODE_EXPIRATION = 5;
     private static final int VERIFICATION_CODE_RANGE = 999999;
     private static final String VERIFY_EMAIL_TITLE = "Verification Code";
     private static final String EMAIL_KEY_PREFIX = "verify:email:";
+    private static final String CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX = "verify:password:email:";
     private static final String EMAIL_VERIFY_SUCCESS_KEY_PREFIX = "verify:email:success:";
 
     @SecureKey("secret.keys.email.account")
@@ -71,10 +72,29 @@ public class EmailVerifyServiceImpl implements EmailVerifyService {
         }
     }
 
+    @Override
+    public void sendPasswordResetEmail(String email) {
+        String resetCode = generateVerifyCode();
+        redisTemplate.opsForValue().set(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email), resetCode, VERIFY_CODE_EXPIRATION, TimeUnit.MINUTES);
 
-    private String generateVerifyCode() {
-        Random random = new Random();
-        return String.format("%06d", random.nextInt(VERIFICATION_CODE_RANGE));
+        String resetUrl = String.format("http://localhost/reset-password?email=%s&code=%s", email, resetCode);
+        String emailContent = String.format(
+                "비밀번호 변경 요청이 들어왔습니다.\n%s\n\n" +
+                        "만약 비밀번호 변경 요청을 하지 않으셨다면 보안을 위해 비밀번호를 변경해주세요.",
+                resetUrl
+        );
+
+        sendEmail(email, "Nhn24.store 비밀번호 변경", emailContent);
+    }
+
+    @Override
+    public void validateResetPasswordCode(String email, String code) {
+        String storedCode = redisTemplate.opsForValue().get(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email));
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
+        }
+
+        redisTemplate.delete(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email));
     }
 
     protected void sendEmail(String recipientEmail, String subject, String content) {
@@ -92,6 +112,11 @@ public class EmailVerifyServiceImpl implements EmailVerifyService {
             log.error("Mail Message Error : {}", messagingEx.getMessage());
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String generateVerifyCode() {
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(VERIFICATION_CODE_RANGE));
     }
 
     private Session createEmailSession() {

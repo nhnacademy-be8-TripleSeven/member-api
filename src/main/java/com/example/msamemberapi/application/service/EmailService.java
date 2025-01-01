@@ -1,9 +1,11 @@
 package com.example.msamemberapi.application.service;
 
-public interface EmailVerifyService {
+public interface EmailService {
 
     void sendVerifyCode(String email);
     boolean isVerified(String email, String code);
     void verify(String email, String code);
     void validateEmailIsVerified(String email);
+    void sendPasswordResetEmail(String email);
+    void validateResetPasswordCode(String email, String code);
 }

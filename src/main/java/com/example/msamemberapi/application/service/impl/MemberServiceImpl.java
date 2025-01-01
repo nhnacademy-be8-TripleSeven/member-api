@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
+import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
@@ -14,7 +15,6 @@ import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
-import com.example.msamemberapi.application.service.EmailVerifyService;
 import com.example.msamemberapi.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +60,10 @@ public class MemberServiceImpl implements MemberService {
     public MemberAccountInfo getMemberAccountByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
 
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
+        }
+
         return new MemberAccountInfo(member.getMemberAccount());
     }
 
@@ -70,7 +73,32 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByUserPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new CustomException(ErrorCode.PHONE_NOT_FOUND));
 
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.PHONE_NOT_FOUND);
+        }
+
         return new MemberAccountInfo(member.getMemberAccount());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateMatchingLoginIdAndEmail(String email, String loginId) {
+        if (!getMemberAccountByEmail(email).getLoginId().equals(loginId)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateMemberPassword(UpdatePasswordRequestDto updatePasswordRequestDto) {
+        Member member = memberRepository.findByEmail(updatePasswordRequestDto.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
+
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
+        }
+
+        MemberAccount memberAccount = member.getMemberAccount();
+        memberAccount.changePassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
     }
 
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
