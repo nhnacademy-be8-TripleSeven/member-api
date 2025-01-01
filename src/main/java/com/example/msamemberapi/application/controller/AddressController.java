@@ -54,7 +54,8 @@ public class AddressController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<AddressResponseDto> updateAddress(@PathVariable Long id, @Valid @RequestBody AddressRequestDto requestDto) {
+    public ResponseEntity<AddressResponseDto> updateAddress(@PathVariable Long id,
+                                                            @Valid @RequestBody AddressRequestDto requestDto) {
         AddressResponseDto updatedAddress = addressService.updateAddress(id, requestDto);
         return ResponseEntity.ok(updatedAddress);
     }
@@ -77,8 +78,8 @@ public class AddressController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @GetMapping("/search")
-    public ResponseEntity<List<KakaoAddressResponseDto>> searchAddress(@RequestParam String keyword) {
-        List<KakaoAddressResponseDto> results = addressService.searchRoadAddress(keyword);
+    public ResponseEntity<List<KakaoAddressResponseDto.Document>> searchAddress(@RequestParam String keyword) {
+        List<KakaoAddressResponseDto.Document> results = addressService.searchRoadAddress(keyword);
         return ResponseEntity.ok(results);
     }
 }

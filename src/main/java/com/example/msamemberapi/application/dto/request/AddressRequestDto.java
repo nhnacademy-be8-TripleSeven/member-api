@@ -16,19 +16,18 @@ import lombok.NoArgsConstructor;
 public class AddressRequestDto {
 
     @NotNull
-    @NotBlank(message = "도로명 주소는 필수 입력 항목입니다.")
-    @Size(max = 255, message = "도로명 주소는 최대 255자까지 가능합니다.")
+    @NotBlank
+    private String postcode;
+
+    @NotNull
+    @NotBlank
     private String roadAddress;
 
     @NotNull
-    @NotBlank(message = "상세 주소는 필수 입력 항목입니다.")
-    @Size(max = 255, message = "상세 주소는 최대 255자까지 가능합니다.")
-    private String detail;
+    @NotBlank
+    private String detailAddress;
 
     @NotNull
-    @NotBlank(message = "별칭은 필수 항목입니다.")
-    @Size(max = 50, message = "별칭은 최대 50자까지 입력 가능합니다.")
+    @NotBlank
     private String alias;
-
-
 }

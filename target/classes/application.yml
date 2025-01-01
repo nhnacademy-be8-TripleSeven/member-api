@@ -1,17 +1,12 @@
 spring:
   profiles:
     active: dev
+  data:
+    redis:
+      host: 133.186.241.167
+      port: 6379
+      password: "*N2vya7H@muDTwdNMR!"
 
-#  dbcp2:
-#    initial-size: 5         # 풀 초기 크기
-#    max-total: 20           # 최대 커넥션 수
-#    max-idle: 10            # 최대 유휴 커넥션 수
-#    min-idle: 5             # 최소 유휴 커넥션 수
-#    max-wait-millis: 30000  # 커넥션 풀에서 커넥션을 얻을 때 최대 대기 시간 (밀리초)
-#    validation-query: SELECT 1 # 커넥션 유효성 검사 쿼리
-#    test-on-borrow: true    # 커넥션 풀에서 커넥션을 빌릴 때 유효성 검사
-#    test-while-idle: true   # 유휴 커넥션에 대해 주기적인 유효성 검사
-#    time-between-eviction-runs-millis: 30000 # 커넥션 검증 주기
 
   lifecycle:
     timeout-per-shutdown-phase: 30s
@@ -46,9 +41,29 @@ management:
     env:
       enabled: true
 
+secret:
+  url: https://api-keymanager.nhncloudservice.com
+  appKey: qTQNj7LyHhdAazH3
+  keys:
+    db:
+      url: 50cec4261dc94323ab8e3d6a44412ab4
+      username: aaf3edf33ca847e3ac72361613ee1784
+      password: 23b0d6961e204d59a645d662f6843f25
+
+    email:
+      account: 105936ae31de41628611ecbd5e08476c
+      password: d2a9fc886fc84e208b8d5d44268f3f10
+  keyStoreFilePath: triple-seven.p12
+  password: nhn24
+
 server:
   shutdown: graceful
 
 logstash:
   host: 115.94.72.197
   port: 50000 # Logstash TCP input 포트
+
+
+  kakao:
+    api:
+      key: KakaoAK a647f3b0334d3e5914bdf0f748674f64

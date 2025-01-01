@@ -15,7 +15,7 @@ public class MemberAddressRequestDto {
 
     @NotNull
     @NotBlank(message = "별칭을 적어주세요.")
-    @Size(max = 50, message = "별칭은 최대 50자까지 가능합니다.")
+    @Size(max = 50)
     private String alias;
 
     @NotNull

@@ -2,19 +2,26 @@ package com.example.msamemberapi.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class KakaoAddressResponseDto {
+    private List<Document> documents;
 
-    private String addressName;
-    private String buildingName;
-    private String mainBuildingNo;
-    private String region1DepthName;
-    private String region2DepthName;
-    private String region3DepthName;
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Document {
+        private String addressName;
+        private String roadAddressName;
+        private String buildingName;
+    }
 }

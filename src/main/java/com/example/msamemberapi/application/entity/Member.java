@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.Cascade;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +27,6 @@ public class Member {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = false)
-    private String phoneNumber;
-    private String name;
     private Date birth;
 
     @Enumerated(EnumType.STRING)
@@ -39,8 +35,11 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL) // Cascade 옵션 확인
+    private User user;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
 

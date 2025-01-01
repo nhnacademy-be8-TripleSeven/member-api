@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class AddressResponseDto {
-
     private Long id;
-    private String name;
-    private String detail;
+    private String postcode;
+    private String roadAddress;
+    private String detailAddress;
     private String alias;
 }

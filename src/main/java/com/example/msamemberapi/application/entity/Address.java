@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -19,18 +18,21 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
+    private String postcode;
+
+    @Column(nullable = false)
     private String roadAddress;
 
-    @Column(nullable = false, length = 255)
-    private String detail;
+    @Column(nullable = false)
+    private String detailAddress;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String alias;
 
-    public void updateDetails(String roadAddress, String detail, String alias) {
+    public void updateDetails(String roadAddress, String detailAddress, String alias) {
         this.roadAddress = roadAddress;
-        this.detail = detail;
+        this.detailAddress = detailAddress;
         this.alias = alias;
     }
 }

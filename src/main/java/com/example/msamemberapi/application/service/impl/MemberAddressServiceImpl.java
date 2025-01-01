@@ -50,17 +50,15 @@ public class MemberAddressServiceImpl implements MemberAddressService {
             throw new IllegalStateException("주소는 최대 10개까지만 등록할 수 있습니다.");
         }
 
-        // 기존 기본 주소 해제 (기본 주소 설정 요청 시)
         if (requestDto.getIsDefault()) {
             List<MemberAddress> existingAddresses = memberAddressRepository.findByMemberId(memberId);
             existingAddresses.forEach(address -> address.setDefault(false));
             memberAddressRepository.saveAll(existingAddresses);
         }
 
-        // MemberAddress 생성 및 저장
         MemberAddress memberAddress = MemberAddress.builder()
                 .member(member)
-                .addressId(null) // 실제 Address ID
+                .addressId(null)
                 .alias(requestDto.getAlias())
                 .isDefault(requestDto.getIsDefault())
                 .build();
@@ -88,18 +86,18 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
     @Override
     @Transactional
-    public void updateAliasAndDefault(Long memberAddressId, String alias, Boolean isDefault) {
+    public void updateAlias(Long memberAddressId, String alias, Boolean isDefault) {
         MemberAddress memberAddress = memberAddressRepository.findById(memberAddressId)
                 .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
 
         memberAddress.updateAlias(alias);
 
-        if (isDefault != null && isDefault) {
-            List<MemberAddress> existingAddresses = memberAddressRepository.findByMemberId(memberAddress.getMember().getId());
-            existingAddresses.forEach(address -> address.setDefault(false));
-            memberAddress.setDefault(true);
+        if (Boolean.TRUE.equals(isDefault)) {
+            List<MemberAddress> addresses = memberAddressRepository.findByMemberId(memberAddress.getMember().getId());
+            addresses.forEach(address -> address.setDefault(false));
         }
 
+        memberAddress.setDefault(isDefault);
         memberAddressRepository.save(memberAddress);
     }
 }

@@ -64,20 +64,17 @@ public class MemberAddressController {
     }
 
     @PatchMapping("/{addressId}")
-    @Operation(summary = "주소 별칭, 기본 주소 수정", description = "특정 주소의 별칭을 수정하고 기본 주소 여부를 설정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "주소 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
-    })
+    @Operation(summary = "주소 별칭 및 기본 주소 수정", description = "특정 주소의 별칭과 기본 주소 여부를 수정합니다.")
     public ResponseEntity<Void> updateAliasAndDefault(
             @PathVariable Long memberId,
             @PathVariable Long addressId,
             @RequestBody Map<String, Object> request) {
+
         String alias = (String) request.get("alias");
         Boolean isDefault = (Boolean) request.get("isDefault");
 
         memberAddressService.updateAlias(addressId, alias, isDefault);
+
         return ResponseEntity.ok().build();
     }
 }

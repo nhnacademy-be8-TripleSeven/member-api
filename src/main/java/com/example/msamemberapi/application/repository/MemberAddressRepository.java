@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberAddressRepository extends JpaRepository<MemberAddress, Long> {
     List<MemberAddress> findByMemberId(Long memberId);
-
     Optional<MemberAddress> findByMemberIdAndAddressId(Long memberId, Long addressId);
 }

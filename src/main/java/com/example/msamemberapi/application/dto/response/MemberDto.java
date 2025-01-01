@@ -19,25 +19,20 @@ import java.util.List;
 public class MemberDto {
 
     private Long id;
-    private MemberAccountInfo memberAccount;
     private String email;
     private String phoneNumber;
     private String name;
     private Date birth;
     private Gender gender;
     private MemberGrade memberGrade;
-    private List<MemberGradeHistory> memberGradeHistory;
 
     public MemberDto(Member member) {
         this.id = member.getId();
-        this.memberAccount = new MemberAccountInfo(member.getMemberAccount().getId(),
-                member.getMemberAccount().getPassword());
         this.email = member.getEmail();
-        this.phoneNumber = member.getPhoneNumber();
-        this.name = member.getName();
+        this.phoneNumber = member.getUser().getPhoneNumber();
+        this.name = member.getUser().getName();
         this.birth = member.getBirth();
         this.gender = member.getGender();
         this.memberGrade = member.getMemberGrade();
-        this.memberGradeHistory = new ArrayList<>(member.getGradeHistories());
     }
 }
