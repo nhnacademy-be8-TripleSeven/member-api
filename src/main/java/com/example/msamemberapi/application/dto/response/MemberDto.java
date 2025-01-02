@@ -23,8 +23,8 @@ public class MemberDto {
     private String phoneNumber;
     private String name;
     private Date birth;
-    private Gender gender;
-    private MemberGrade memberGrade;
+    private String gender;
+    private String memberGrade;
 
     public MemberDto(Member member) {
         this.id = member.getId();
@@ -32,8 +32,8 @@ public class MemberDto {
         this.phoneNumber = member.getUser().getPhoneNumber();
         this.name = member.getUser().getName();
         this.birth = member.getBirth();
-        this.gender = member.getGender();
-        this.memberGrade = member.getMemberGrade();
+        this.gender = member.getGender().name();
+        this.memberGrade = member.getMemberGrade().name();
     }
 
     @QueryProjection
@@ -44,7 +44,7 @@ public class MemberDto {
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.birth = birth;
-        this.gender = gender;
-        this.memberGrade = memberGrade;
+        this.gender = gender.name();
+        this.memberGrade = memberGrade.name();
     }
 }
