@@ -17,6 +17,7 @@ import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -105,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Collection<MemberDto> getMembers(String name, Pageable pageable) {
+    public Page<MemberDto> getMembers(String name, Pageable pageable) {
         return memberRepository.findMembers(name, pageable);
     }
 

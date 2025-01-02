@@ -8,6 +8,8 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -22,10 +24,11 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<MemberDto> findMembers(String name, Pageable pageable) {
+    public Page<MemberDto> findMembers(String name, Pageable pageable) {
         QMember member = QMember.member;
 
-        return queryFactory.select(new QMemberDto(
+        List<MemberDto> content = queryFactory
+                .select(new QMemberDto(
                         member.id,
                         member.email,
                         member.user.phoneNumber,
@@ -40,6 +43,13 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        long total = queryFactory
+                .selectFrom(member)
+                .where(name != null ? member.user.name.containsIgnoreCase(name) : null)
+                .fetchCount();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort, QMember member) {
@@ -48,12 +58,12 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                     String property = order.getProperty();
                     PathBuilder<?> entityPath = new PathBuilder<>(member.getType(), member.getMetadata());
                     if (order.getProperty().equals("user.name")) {
-                        // String 속성인 경우
+
                         return order.isAscending()
                                 ? entityPath.getString(property).asc()
                                 : entityPath.getString(property).desc();
                     } else if (order.getProperty().equals("birth")) {
-                        // Date 속성인 경우
+
                         return order.isAscending()
                                 ? entityPath.getDate(property, Date.class).asc()
                                 : entityPath.getDate(property, Date.class).desc();

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,8 @@ public class MemberManageController {
             @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @GetMapping
-    public List<MemberDto> getMembers(@RequestParam(required = false) String name, Pageable pageable) {
-        return memberService.getMembers(name, pageable).stream().toList();
+    public Page<MemberDto> getMembers(@RequestParam(required = false) String name, Pageable pageable) {
+        return memberService.getMembers(name, pageable);
     }
 
     @Operation(summary = "멤버 이름으로 검색한 리스트 조회", description = "검색한 문자열이 포함된 이름을 가진 멤버의 리스트 반환. 페이징 지원")
