@@ -77,7 +77,7 @@ public class EmailServiceImpl implements EmailService {
         String resetCode = generateVerifyCode();
         redisTemplate.opsForValue().set(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email), resetCode, VERIFY_CODE_EXPIRATION, TimeUnit.MINUTES);
 
-        String resetUrl = String.format("https://nhn24.store/reset-password?email=%s&code=%s", email, resetCode);
+        String resetUrl = String.format("https://nhn24.store/frontend/reset-password?email=%s&code=%s", email, resetCode);
         String emailContent = String.format(
                 "비밀번호 변경 요청이 들어왔습니다.\n%s\n\n" +
                         "만약 비밀번호 변경 요청을 하지 않으셨다면 보안을 위해 비밀번호를 변경해주세요.",
