@@ -5,6 +5,9 @@ import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Collection;
 
 public interface MemberService {
 
@@ -15,4 +18,7 @@ public interface MemberService {
     MemberAccountInfo getMemberAccountByEmail(String email);
     void validateMatchingLoginIdAndEmail(String email, String loginId);
     void updateMemberPassword(UpdatePasswordRequestDto updatePasswordRequestDto);
+
+    Collection<MemberDto> getMembers(String name, Pageable pageable);
+
 }

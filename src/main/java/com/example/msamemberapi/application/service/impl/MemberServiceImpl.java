@@ -17,12 +17,15 @@ import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -99,6 +102,11 @@ public class MemberServiceImpl implements MemberService {
 
         MemberAccount memberAccount = member.getMemberAccount();
         memberAccount.changePassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
+    }
+
+    @Override
+    public Collection<MemberDto> getMembers(String name, Pageable pageable) {
+        return memberRepository.findMembers(name, pageable);
     }
 
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
