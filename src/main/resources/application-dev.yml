@@ -6,11 +6,11 @@ spring:
     redis:
       host: localhost
       port: 6379
-
+      database: 0
   datasource:
-    url: jdbc:mysql://localhost:3306/nhn_member?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: Lushlife99!
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: org.apache.commons.dbcp2.BasicDataSource
 
