@@ -3,6 +3,7 @@ package com.example.msamemberapi.application.repository.querydsl.impl;
 import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.dto.response.QMemberDto;
 import com.example.msamemberapi.application.entity.QMember;
+import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.repository.querydsl.MemberRepositoryCustom;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -24,7 +25,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<MemberDto> findMembers(String name, Pageable pageable) {
+    public Page<MemberDto> findMembers(String name, MemberGrade memberGrade, Pageable pageable) {
         QMember member = QMember.member;
 
         List<MemberDto> content = queryFactory
@@ -38,7 +39,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.memberGrade
                 ))
                 .from(member)
-                .where(name != null ? member.user.name.containsIgnoreCase(name) : null)
+                .where(
+                        name != null ? member.user.name.containsIgnoreCase(name) : null,
+                        memberGrade != null ? member.memberGrade.eq(memberGrade) : null
+                )
                 .orderBy(getOrderSpecifiers(pageable.getSort(), member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -46,7 +50,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         long total = queryFactory
                 .selectFrom(member)
-                .where(name != null ? member.user.name.containsIgnoreCase(name) : null)
+                .where(
+                        name != null ? member.user.name.containsIgnoreCase(name) : null,
+                        memberGrade != null ? member.memberGrade.eq(memberGrade) : null
+                )
                 .fetchCount();
 
         return new PageImpl<>(content, pageable, total);

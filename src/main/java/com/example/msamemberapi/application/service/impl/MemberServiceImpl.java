@@ -106,8 +106,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembers(String name, Pageable pageable) {
-        return memberRepository.findMembers(name, pageable);
+    public Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable) {
+        return memberRepository.findMembers(name, memberGrade, pageable);
     }
 
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
