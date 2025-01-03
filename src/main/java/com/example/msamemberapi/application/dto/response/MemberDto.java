@@ -5,6 +5,7 @@ import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.entity.MemberGradeHistory;
 import com.example.msamemberapi.application.enums.Gender;
 import com.example.msamemberapi.application.enums.MemberGrade;
+import com.querydsl.core.annotations.QueryProjection;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
 public class MemberDto {
 
@@ -23,8 +23,8 @@ public class MemberDto {
     private String phoneNumber;
     private String name;
     private Date birth;
-    private Gender gender;
-    private MemberGrade memberGrade;
+    private String gender;
+    private String memberGrade;
 
     public MemberDto(Member member) {
         this.id = member.getId();
@@ -32,7 +32,19 @@ public class MemberDto {
         this.phoneNumber = member.getUser().getPhoneNumber();
         this.name = member.getUser().getName();
         this.birth = member.getBirth();
-        this.gender = member.getGender();
-        this.memberGrade = member.getMemberGrade();
+        this.gender = member.getGender().name();
+        this.memberGrade = member.getMemberGrade().name();
+    }
+
+    @QueryProjection
+    public MemberDto(Long id, String email, String phoneNumber, String name, Date birth,
+                     Gender gender, MemberGrade memberGrade) {
+        this.id = id;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.name = name;
+        this.birth = birth;
+        this.gender = gender.name();
+        this.memberGrade = memberGrade.name();
     }
 }

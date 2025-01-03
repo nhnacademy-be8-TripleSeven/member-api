@@ -5,6 +5,11 @@ import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
+import com.example.msamemberapi.application.enums.MemberGrade;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Collection;
 
 public interface MemberService {
 
@@ -15,4 +20,7 @@ public interface MemberService {
     MemberAccountInfo getMemberAccountByEmail(String email);
     void validateMatchingLoginIdAndEmail(String email, String loginId);
     void updateMemberPassword(UpdatePasswordRequestDto updatePasswordRequestDto);
+
+    Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable);
+
 }
