@@ -115,6 +115,7 @@ public class MemberServiceImpl implements MemberService {
                 .memberAccount(memberAccount)
                 .user(user)
                 .birth(joinRequestDto.getBirth())
+                .memberGrade(MemberGrade.REGULAR)
                 .gender(joinRequestDto.getGender())
                 .email(joinRequestDto.getEmail())
                 .gradeHistories(new ArrayList<>())
