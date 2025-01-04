@@ -15,6 +15,13 @@ spring:
   application:
     name: member-api
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 eureka:
   client:
     fetch-registry: true
