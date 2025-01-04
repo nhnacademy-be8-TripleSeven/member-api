@@ -26,6 +26,7 @@ public enum ErrorCode {
     ALREADY_EXIST_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 로그인 아이디입니다."),
     ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일 입니다."),
     ALREADY_EXIST_PHONE(HttpStatus.CONFLICT, "이미 존재하는 핸드폰번호 입니다."),
+    INSUFFICIENT_BOOK_QUANTITY(HttpStatus.CONFLICT, "책의 재고 수량이 부족합니다."),
 
     /* 500 INTERNAL_SERVER_ERROR : 서버오류 */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러"),
