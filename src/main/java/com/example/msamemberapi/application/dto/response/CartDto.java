@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -20,8 +19,18 @@ public class CartDto implements Serializable {
     @Getter
     public static class CartItem implements Serializable {
         private Long bookId;
-        private String tag;
         private String name;
+        private int regularPrice;
+        private int salePrice;
         private int quantity;
+
+        public CartItem(BookDetailResponseDto bookDetail, long bookId, int quantity) {
+            this.bookId = bookId;
+            this.name = bookDetail.getTitle();
+            this.regularPrice = bookDetail.getRegularPrice();
+            this.salePrice = bookDetail.getSalePrice();
+            this.quantity = quantity;
+        }
     }
+
 }
