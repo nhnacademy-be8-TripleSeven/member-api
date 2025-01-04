@@ -2,6 +2,7 @@ package com.example.msamemberapi.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,9 +12,10 @@ import java.util.List;
 @Getter
 public class CartDto implements Serializable {
 
-    private final Long Id;
+    private final String Id;
     private List<CartItem> cartItems;
 
+    @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     public static class CartItem implements Serializable {
