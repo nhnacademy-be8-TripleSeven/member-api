@@ -95,6 +95,8 @@ public class ProjectInitManager {
                 .user(user)
                 .birth(new Date())
                 .build();
+
+        member.addRole(MemberRole.USER);
         return member;
     }
 }
