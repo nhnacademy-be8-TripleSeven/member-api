@@ -50,6 +50,17 @@ public class Member {
         roles.add(memberRole.toString());
     }
 
+    public void removeRole(MemberRole memberRole) {
+        for (int i = 0; i < this.roles.size(); i++) {
+            String role = this.roles.get(i);
+            if (role.contains(memberRole.toString())) {
+                this.roles.remove(i);
+                return;
+            }
+        }
+
+    }
+
     public void addGradeHistory(MemberGradeHistory gradeHistory) {
         this.gradeHistories.add(gradeHistory);
     }

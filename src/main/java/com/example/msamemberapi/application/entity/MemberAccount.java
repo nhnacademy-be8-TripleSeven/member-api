@@ -24,7 +24,8 @@ public class MemberAccount {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
     private String password;
-    private LocalDateTime lastLoggedInAt;
+    @Builder.Default
+    private LocalDateTime lastLoggedInAt = LocalDateTime.now();
 
     public void changePassword(String password) {
         this.password = password;
