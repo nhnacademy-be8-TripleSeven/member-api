@@ -96,5 +96,16 @@ public class AccountController {
     }
 
 
+    @Operation(summary = "회원 로그인", description = "인증 코드를 확인 후 일치할 시 비밀번호 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증번호 일치, 비밀번호 변경 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 코드 불일치"),
+            @ApiResponse(responseCode = "404", description = "회원가입 한 이메일을 찾을 수 없음")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<Void> updateMemberLoggedInAt(@RequestHeader("X-USER") Long userId) {
+        memberService.updateLastLoggedInAt(userId);
+        return ResponseEntity.ok().build();
+    }
 
 }

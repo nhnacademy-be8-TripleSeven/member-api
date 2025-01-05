@@ -22,5 +22,5 @@ public interface MemberService {
     void updateMemberPassword(UpdatePasswordRequestDto updatePasswordRequestDto);
 
     Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable);
-
+    void updateLastLoggedInAt(Long userId);
 }
