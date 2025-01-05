@@ -8,4 +8,6 @@ public interface EmailService {
     void validateEmailIsVerified(String email);
     void sendPasswordResetEmail(String email);
     void validateResetPasswordCode(String email, String code);
+    void sendAccountActiveEmail(String loginId);
+    void verifyAccountActiveCode(String email, String code);
 }

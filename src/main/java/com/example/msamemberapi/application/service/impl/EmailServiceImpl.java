@@ -1,13 +1,18 @@
 package com.example.msamemberapi.application.service.impl;
 
+import com.example.msamemberapi.application.entity.Member;
+import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.EmailService;
 import com.example.msamemberapi.common.annotations.secure.SecureKey;
+import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.*;
 import javax.mail.internet.AddressException;
@@ -29,6 +34,7 @@ public class EmailServiceImpl implements EmailService {
     private static final String EMAIL_KEY_PREFIX = "verify:email:";
     private static final String CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX = "verify:password:email:";
     private static final String EMAIL_VERIFY_SUCCESS_KEY_PREFIX = "verify:email:success:";
+    private static final String ACCOUNT_ACTIVE_EMAIL_KEY_PREFIX = "verify:account:active:";
 
     @SecureKey("secret.keys.email.account")
     private String USERNAME;
@@ -36,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
     private String PASSWORD;
     private final Session EMAIL_SESSION = createEmailSession();
     private final RedisTemplate<String, String> redisTemplate;
+    private final MemberRepository memberRepository;
 
 
     @Override
@@ -94,6 +101,38 @@ public class EmailServiceImpl implements EmailService {
             throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
         }
 
+        redisTemplate.delete(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email));
+    }
+
+    @Override
+    public void sendAccountActiveEmail(String loginId) {
+
+        Member member = memberRepository.findByMemberAccount_Id(loginId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+
+        String resetCode = generateVerifyCode();
+        redisTemplate.opsForValue().set(ACCOUNT_ACTIVE_EMAIL_KEY_PREFIX.concat(member.getEmail()), resetCode, VERIFY_CODE_EXPIRATION, TimeUnit.MINUTES);
+
+        String resetUrl = String.format("https://nhn24.store/frontend/active-account?email=%s&code=%s", member.getEmail(), resetCode);
+        String emailContent = String.format(
+                "사용자의 계정이 일시적으로 잠겼습니다.\n%s\n\n" +
+                        "계정 잠금을 해제하려면 아래 링크를 클릭하세요",
+                resetUrl
+        );
+
+        sendEmail(member.getEmail(), "Nhn24.store 휴면계정 해제", emailContent);
+    }
+
+    @Override
+    @Transactional
+    public void verifyAccountActiveCode(String email, String code) {
+        String storedCode = redisTemplate.opsForValue().get(ACCOUNT_ACTIVE_EMAIL_KEY_PREFIX.concat(email));
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
+        }
+
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        member.removeRole(MemberRole.INACTIVE);
+        member.addRole(MemberRole.USER);
         redisTemplate.delete(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email));
     }
 

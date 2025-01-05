@@ -96,5 +96,38 @@ public class AccountController {
     }
 
 
+    @Operation(summary = "회원 로그인", description = "회원 로그인 시 마지막 로그인 시간 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "회원을 찾을 수 없음")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<Void> updateMemberLoggedInAt(@RequestHeader("X-USER") Long userId) {
+        memberService.updateLastLoggedInAt(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "휴면 계정 해제 코드 발송", description = "휴면 계정을 해제하는 이메일 인증코드 발송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    @PostMapping("/unlock/account")
+    public ResponseEntity<Void> sendAccountActiveEmail(@RequestParam String loginId) {
+        emailService.sendAccountActiveEmail(loginId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "휴면 계정 해제", description = "코드를 검증하고 계정의 휴면 상태 해제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "인증 코드 불일치")
+    })
+    @PostMapping("/unlock/account/verify")
+    public ResponseEntity<Void> verifyAccountActiveCode(@RequestParam String email, @RequestParam String code) {
+        emailService.verifyAccountActiveCode(email, code);
+        return ResponseEntity.ok().build();
+    }
 
 }

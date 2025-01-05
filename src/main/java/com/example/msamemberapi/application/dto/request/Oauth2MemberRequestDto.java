@@ -47,7 +47,7 @@ public class Oauth2MemberRequestDto {
                 .memberGrade(MemberGrade.REGULAR)
                 .build();
 
-        member.addRole(MemberRole.PAYCO);
+        member.addRole(MemberRole.PAYCO_USER);
         return member;
     }
 

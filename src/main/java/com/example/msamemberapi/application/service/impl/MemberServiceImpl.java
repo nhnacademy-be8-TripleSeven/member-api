@@ -110,6 +110,13 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findMembers(name, memberGrade, pageable);
     }
 
+    @Override
+    @Transactional
+    public void updateLastLoggedInAt(Long userId) {
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        member.getMemberAccount().updateLastLoggedInAt();
+    }
+
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
         Member member = Member.builder()
                 .memberAccount(memberAccount)
