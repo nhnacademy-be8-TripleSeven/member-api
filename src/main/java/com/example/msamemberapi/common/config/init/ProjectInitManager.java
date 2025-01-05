@@ -71,7 +71,7 @@ public class ProjectInitManager {
                 .birth(new Date())
                 .build();
 
-        admin.addRole(MemberRole.ADMIN);
+        admin.addRole(MemberRole.ADMIN_USER);
         return admin;
     }
 

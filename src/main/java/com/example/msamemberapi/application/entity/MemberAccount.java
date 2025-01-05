@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -22,8 +24,13 @@ public class MemberAccount {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
     private String password;
+    private LocalDateTime lastLoggedInAt;
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void updateLastLoggedInAt() {
+        this.lastLoggedInAt = LocalDateTime.now();
     }
 }
