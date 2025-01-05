@@ -36,8 +36,13 @@ public class ProjectInitManager {
             for (int i = 0; i < 21; i++) {
                 members.add(createMember(i));
             }
-            memberRepository.saveAll(members);
         }
+
+        if (!memberRepository.existsByMemberAccount_Id("inactive")) {
+            Member inActiveMember = createInActiveMember();
+            members.add(inActiveMember);
+        }
+        memberRepository.saveAll(members);
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -97,6 +102,31 @@ public class ProjectInitManager {
                 .build();
 
         member.addRole(MemberRole.USER);
+        return member;
+    }
+
+    private Member createInActiveMember() {
+        MemberAccount account = MemberAccount.builder()
+                .id("inactive")
+                .password(passwordEncoder.encode("1234"))
+                .accountType(AccountType.REGISTERED)
+                .build();
+
+        User user = User.builder()
+                .name("INACTIVE_MEMBER")
+                .phoneNumber("12311231212")
+                .build();
+
+        Member member = Member.builder()
+                .memberAccount(account)
+                .memberGrade(MemberGrade.REGULAR)
+                .gender(Gender.MALE)
+                .email("wjdcks25@naver.com")
+                .user(user)
+                .birth(new Date())
+                .build();
+
+        member.addRole(MemberRole.INACTIVE);
         return member;
     }
 }
