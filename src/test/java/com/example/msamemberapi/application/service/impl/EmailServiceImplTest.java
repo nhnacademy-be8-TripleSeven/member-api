@@ -1,7 +1,11 @@
 package com.example.msamemberapi.application.service.impl;
 
+import com.example.msamemberapi.application.entity.Member;
+import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.repository.MemberRepository;
+import com.example.msamemberapi.application.service.EmailSendService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,14 +19,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class EmailServiceImplTest {
 
+    private static final long VERIFY_CODE_EXPIRATION = 5;
     @InjectMocks
     private EmailServiceImpl emailVerifyService;
+
+    @Mock
+    private EmailSendService emailSendService;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @Mock
     private RedisTemplate<String, String> redisTemplate;
@@ -37,8 +49,6 @@ class EmailServiceImplTest {
     void setUp() {
 
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(emailVerifyService, "USERNAME", "TEST_USERNAME@example.com");
-        ReflectionTestUtils.setField(emailVerifyService, "PASSWORD", "TEST_PASSWORD");
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(redisTemplate.opsForList()).thenReturn(listOperations);
     }
@@ -137,4 +147,75 @@ class EmailServiceImplTest {
         CustomException exception = assertThrows(CustomException.class, () -> emailVerifyService.validateEmailIsVerified(email));
         assertEquals(ErrorCode.INVALIDATE_EMAIL, exception.getErrorCode());
     }
+
+    @Test
+    @DisplayName("이메일 인증 코드 전송")
+    void sendVerifyCode_success() {
+        // Arrange
+        String email = "test@example.com";
+        String verifyCode = "123456";
+
+        doNothing().when(valueOperations).set("verify:email:" + email, verifyCode, VERIFY_CODE_EXPIRATION, TimeUnit.MINUTES);
+        doNothing().when(emailSendService).sendEmail(eq(email), anyString(), contains(verifyCode));
+
+        // Act
+        emailVerifyService.sendVerifyCode(email);
+
+        // Assert
+        verify(valueOperations, times(1)).set(eq("verify:email:" + email), anyString(), eq(VERIFY_CODE_EXPIRATION), eq(TimeUnit.MINUTES));
+        verify(emailSendService, times(1)).sendEmail(eq(email), eq("Verification Code"), contains("Verification Code"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 재설정 이메일 전송")
+    void sendPasswordResetEmail_success() {
+        // Arrange
+        String email = "test@example.com";
+
+        doNothing().when(valueOperations).set(contains("verify:password:email:" + email), anyString(), eq(VERIFY_CODE_EXPIRATION), eq(TimeUnit.MINUTES));
+        doNothing().when(emailSendService).sendEmail(eq(email), anyString(), contains("reset-password"));
+
+        // Act
+        emailVerifyService.sendPasswordResetEmail(email);
+
+        // Assert
+        verify(valueOperations, times(1)).set(contains("verify:password:email:" + email), anyString(), eq(VERIFY_CODE_EXPIRATION), eq(TimeUnit.MINUTES));
+        verify(emailSendService, times(1)).sendEmail(eq(email), eq("Nhn24.store 비밀번호 변경"), contains("reset-password"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 재설정 코드 검증 성공")
+    void validateResetPasswordCode_success() {
+        // Arrange
+        String email = "test@example.com";
+        String code = "123456";
+        when(valueOperations.get("verify:password:email:" + email)).thenReturn(code);
+
+        // Act & Assert
+        assertDoesNotThrow(() -> emailVerifyService.validateResetPasswordCode(email, code));
+        verify(redisTemplate, times(1)).delete("verify:password:email:" + email);
+    }
+
+    @Test
+    @DisplayName("계정 활성화 코드 검증 성공")
+    void verifyAccountActiveCode_success() {
+        // Arrange
+        String email = "test@example.com";
+        String code = "123456";
+        Member member = mock(Member.class);
+        when(valueOperations.get("verify:account:active:" + email)).thenReturn(code);
+        when(memberRepository.findByEmail(email)).thenReturn(java.util.Optional.of(member));
+
+        doNothing().when(member).removeRole(MemberRole.INACTIVE);
+        doNothing().when(member).addRole(MemberRole.USER);
+
+        // Act
+        emailVerifyService.verifyAccountActiveCode(email, code);
+
+        // Assert
+        verify(valueOperations, times(1)).get("verify:account:active:" + email);
+        verify(member, times(1)).removeRole(MemberRole.INACTIVE);
+        verify(member, times(1)).addRole(MemberRole.USER);
+    }
+
 }
