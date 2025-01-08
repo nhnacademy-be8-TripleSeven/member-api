@@ -43,10 +43,19 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "인증 정보 조회 성공"),
             @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
     })
-
-    @GetMapping("/auth")
+    @GetMapping("/auth/login-id")
     public MemberAuthInfo getMemberAuthInfo(@RequestParam String loginId) {
         return memberService.findByMemberId(loginId);
+    }
+
+    @Operation(summary = "멤버 인증 정보 조회", description = "멤버 id를 통해 멤버 인증 정보를 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
+    })
+    @GetMapping("/auth/id")
+    public MemberAuthInfo getMemberAuthInfo(@RequestParam Long memberId) {
+        return memberService.findByMemberId(memberId);
     }
 
     @Operation(summary = "멤버 계정 아이디 조회", description = "휴대폰 번호를 통해 멤버 계정 아이디 조회")
