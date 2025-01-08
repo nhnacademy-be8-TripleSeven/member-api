@@ -4,6 +4,8 @@ import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
+import com.example.msamemberapi.application.dto.response.MemberDto;
+import com.example.msamemberapi.application.feign.BookFeignClient;
 import com.example.msamemberapi.application.service.EmailService;
 import com.example.msamemberapi.application.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final MemberService memberService;
+    private final BookFeignClient bookFeignClient;
     private final EmailService emailService;
 
     @Operation(summary = "멤버 생성", description = "회원가입 시 받은 정보로 멤버 생성")
@@ -34,7 +37,8 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody JoinRequestDto joinRequestDto) {
         emailService.validateEmailIsVerified(joinRequestDto.getEmail());
-        memberService.join(joinRequestDto);
+        MemberDto memberDto = memberService.join(joinRequestDto);
+        bookFeignClient.createWelcomeCoupon(memberDto.getId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
