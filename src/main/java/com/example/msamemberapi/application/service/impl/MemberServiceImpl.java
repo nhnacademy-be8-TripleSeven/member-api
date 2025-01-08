@@ -117,6 +117,13 @@ public class MemberServiceImpl implements MemberService {
         member.getMemberAccount().updateLastLoggedInAt();
     }
 
+    @Override
+    @Transactional
+    public MemberAuthInfo findByMemberId(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+        return new MemberAuthInfo(member);
+    }
+
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
         Member member = Member.builder()
                 .memberAccount(memberAccount)
