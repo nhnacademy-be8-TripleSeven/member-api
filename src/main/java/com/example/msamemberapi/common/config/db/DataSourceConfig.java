@@ -1,6 +1,6 @@
 package com.example.msamemberapi.common.config.db;
 
-import com.example.msamemberapi.application.service.impl.SecureKeyManagerService;
+import com.example.msamemberapi.application.service.skm.SecureKeyManagerService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

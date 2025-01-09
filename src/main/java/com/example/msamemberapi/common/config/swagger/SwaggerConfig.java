@@ -1,8 +1,10 @@
 package com.example.msamemberapi.common.config.swagger;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +17,13 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Member API")
                         .version("1.0")
-                        .description("MSA Member API 명세서입니다.")
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+                        .description("MSA Member API 명세서입니다."))
+                .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes("BearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
     }
 }

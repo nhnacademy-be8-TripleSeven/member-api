@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
+import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
@@ -8,21 +9,24 @@ import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.entity.MemberGradeHistory;
 import com.example.msamemberapi.application.entity.User;
+import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
-import com.example.msamemberapi.application.service.EmailVerifyService;
 import com.example.msamemberapi.application.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +64,10 @@ public class MemberServiceImpl implements MemberService {
     public MemberAccountInfo getMemberAccountByEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
 
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
+        }
+
         return new MemberAccountInfo(member.getMemberAccount());
     }
 
@@ -69,7 +77,44 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByUserPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new CustomException(ErrorCode.PHONE_NOT_FOUND));
 
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.PHONE_NOT_FOUND);
+        }
+
         return new MemberAccountInfo(member.getMemberAccount());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateMatchingLoginIdAndEmail(String email, String loginId) {
+        if (!getMemberAccountByEmail(email).getLoginId().equals(loginId)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateMemberPassword(UpdatePasswordRequestDto updatePasswordRequestDto) {
+        Member member = memberRepository.findByEmail(updatePasswordRequestDto.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
+
+        if (!member.getMemberAccount().getAccountType().equals(AccountType.REGISTERED)) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
+        }
+
+        MemberAccount memberAccount = member.getMemberAccount();
+        memberAccount.changePassword(passwordEncoder.encode(updatePasswordRequestDto.getNewPassword()));
+    }
+
+    @Override
+    public Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable) {
+        return memberRepository.findMembers(name, memberGrade, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void updateLastLoggedInAt(Long userId) {
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        member.getMemberAccount().updateLastLoggedInAt();
     }
 
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
@@ -77,6 +122,7 @@ public class MemberServiceImpl implements MemberService {
                 .memberAccount(memberAccount)
                 .user(user)
                 .birth(joinRequestDto.getBirth())
+                .memberGrade(MemberGrade.REGULAR)
                 .gender(joinRequestDto.getGender())
                 .email(joinRequestDto.getEmail())
                 .gradeHistories(new ArrayList<>())
@@ -107,6 +153,7 @@ public class MemberServiceImpl implements MemberService {
         return MemberAccount.builder()
                 .id(joinRequestDto.getLoginId())
                 .password(passwordEncoder.encode(joinRequestDto.getPassword()))
+                .accountType(AccountType.REGISTERED)
                 .build();
     }
 

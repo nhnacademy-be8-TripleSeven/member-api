@@ -4,7 +4,9 @@ package com.example.msamemberapi.application.enums;
 public enum MemberRole {
 
     USER,
-
+    PAYCO_USER,
+    ADMIN_USER,
+    INACTIVE // 휴면 계정
     ;
 
     @Override

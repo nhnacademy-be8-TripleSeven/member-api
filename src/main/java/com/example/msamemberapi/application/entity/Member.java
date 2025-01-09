@@ -35,12 +35,11 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL) // Cascade 옵션 확인
     private User user;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
 
@@ -49,6 +48,17 @@ public class Member {
 
     public void addRole(MemberRole memberRole) {
         roles.add(memberRole.toString());
+    }
+
+    public void removeRole(MemberRole memberRole) {
+        for (int i = 0; i < this.roles.size(); i++) {
+            String role = this.roles.get(i);
+            if (role.contains(memberRole.toString())) {
+                this.roles.remove(i);
+                return;
+            }
+        }
+
     }
 
     public void addGradeHistory(MemberGradeHistory gradeHistory) {

@@ -4,6 +4,7 @@ import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
+import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.Gender;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
@@ -47,7 +48,6 @@ class MemberServiceImplTest {
 
         when(memberRepository.existsByMemberAccount_Id(joinRequestDto.getLoginId())).thenReturn(false);
         when(memberRepository.existsByEmail(joinRequestDto.getEmail())).thenReturn(false);
-        when(memberRepository.existsByPhoneNumber(joinRequestDto.getPhoneNumber())).thenReturn(false);
         when(passwordEncoder.encode(joinRequestDto.getPassword())).thenReturn("encodedPassword");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -127,9 +127,8 @@ class MemberServiceImplTest {
     void getMemberAccountByEmail_success() {
         // Arrange
         String email = "test@example.com";
-        MemberAccount memberAccount = MemberAccount.builder().id("testUser").build();
+        MemberAccount memberAccount = MemberAccount.builder().id("testUser").accountType(AccountType.REGISTERED).build();
         Member member = Member.builder().email(email).memberAccount(memberAccount).build();
-
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
 
         // Act
