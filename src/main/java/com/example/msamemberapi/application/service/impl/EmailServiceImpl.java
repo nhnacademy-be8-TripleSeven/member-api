@@ -145,15 +145,13 @@ public class EmailServiceImpl implements EmailService {
             message.setText(content);
 
             Transport.send(message);
-        }  catch (AddressException addressEx) {
-            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
         } catch (MessagingException messagingEx) {
             log.error("Mail Message Error : {}", messagingEx.getMessage());
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
         }
     }
 
-    private String generateVerifyCode() {
+    protected String generateVerifyCode() {
         Random random = new Random();
         return String.format("%06d", random.nextInt(VERIFICATION_CODE_RANGE));
     }
