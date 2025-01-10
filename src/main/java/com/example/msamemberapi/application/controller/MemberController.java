@@ -38,8 +38,8 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestParam Long memberId) {
-        memberService.quitMember(memberId);
+    public ResponseEntity<Void> delete(@RequestHeader("X-USER") Long userId) {
+        memberService.quitMember(userId);
         return ResponseEntity.ok().build();
     }
 
