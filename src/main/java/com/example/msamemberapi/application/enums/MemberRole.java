@@ -6,7 +6,8 @@ public enum MemberRole {
     USER,
     PAYCO_USER,
     ADMIN_USER,
-    INACTIVE // 휴면 계정
+    INACTIVE, // 휴면 계정
+    QUIT, // 탈퇴한 계정
     ;
 
     @Override

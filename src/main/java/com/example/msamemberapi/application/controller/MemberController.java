@@ -31,15 +31,15 @@ public class MemberController {
     }
 
 
-    @Operation(summary = "멤버 탈퇴", description = "맴버 계정 탈퇴 (QUIT) 처리")
+    @Operation(summary = "멤버 삭제", description = "멤버 ID를 통해 멤버를 삭제")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "멤버 탈퇴 성공"),
+            @ApiResponse(responseCode = "200", description = "멤버 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @DeleteMapping
-    public ResponseEntity<Void> quit(@RequestHeader("X-USER") Long userId) {
-        memberService.deleteByMemberId(userId);
+    public ResponseEntity<Void> delete(@RequestParam Long memberId) {
+        memberService.quitMember(memberId);
         return ResponseEntity.ok().build();
     }
 

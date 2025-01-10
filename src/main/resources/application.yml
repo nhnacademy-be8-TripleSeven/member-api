@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: instance1
   data:
     redis:
       host: 133.186.241.167
@@ -62,6 +62,8 @@ secret:
     email:
       account: 105936ae31de41628611ecbd5e08476c
       password: d2a9fc886fc84e208b8d5d44268f3f10
+    auth:
+      value: 452fd78c768c4bffa03d8486b1dcf5be
   keyStoreFilePath: triple-seven.p12
   password: nhn24
 
@@ -71,3 +73,4 @@ server:
 logstash:
   host: 115.94.72.197
   port: 50000 # Logstash TCP input 포트
+

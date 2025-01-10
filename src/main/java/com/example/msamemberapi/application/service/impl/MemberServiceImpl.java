@@ -55,8 +55,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void deleteByMemberId(Long memberId) {
-        memberRepository.deleteById(memberId);
+    public void quitMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        if (!hasRole(member.getRoles(), MemberRole.USER.name())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
+        member.removeRole(MemberRole.USER);
+        member.addRole(MemberRole.QUIT);
     }
 
     @Override
@@ -117,6 +123,13 @@ public class MemberServiceImpl implements MemberService {
         member.getMemberAccount().updateLastLoggedInAt();
     }
 
+    @Override
+    @Transactional
+    public MemberAuthInfo findByMemberId(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+        return new MemberAuthInfo(member);
+    }
+
     private Member createMember(JoinRequestDto joinRequestDto, MemberAccount memberAccount, User user) {
         Member member = Member.builder()
                 .memberAccount(memberAccount)
@@ -170,5 +183,16 @@ public class MemberServiceImpl implements MemberService {
         if (memberRepository.existsByUserPhoneNumber(joinRequestDto.getPhoneNumber())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_PHONE);
         }
+    }
+
+    private boolean hasRole(List<String> roles, String roleValue) {
+
+        for (String role : roles) {
+            if (role.contains(roleValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
