@@ -5,21 +5,15 @@ import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
+import com.example.msamemberapi.application.service.EmailSendService;
 import com.example.msamemberapi.application.service.EmailService;
-import com.example.msamemberapi.common.annotations.secure.SecureKey;
-import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.util.List;
-import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -36,20 +30,16 @@ public class EmailServiceImpl implements EmailService {
     private static final String EMAIL_VERIFY_SUCCESS_KEY_PREFIX = "verify:email:success:";
     private static final String ACCOUNT_ACTIVE_EMAIL_KEY_PREFIX = "verify:account:active:";
 
-    @SecureKey("secret.keys.email.account")
-    private String USERNAME;
-    @SecureKey("secret.keys.email.password")
-    private String PASSWORD;
-    private final Session EMAIL_SESSION = createEmailSession();
+
     private final RedisTemplate<String, String> redisTemplate;
     private final MemberRepository memberRepository;
-
+    private final EmailSendService emailSendService;
 
     @Override
     public void sendVerifyCode(String email) {
         String verifyCode = generateVerifyCode();
         redisTemplate.opsForValue().set(EMAIL_KEY_PREFIX.concat(email), verifyCode, VERIFY_CODE_EXPIRATION, TimeUnit.MINUTES);
-        sendEmail(email, VERIFY_EMAIL_TITLE, String.format("Verification Code : %s", verifyCode));
+        emailSendService.sendEmail(email, VERIFY_EMAIL_TITLE, String.format("Verification Code : %s", verifyCode));
     }
 
     @Override
@@ -91,7 +81,7 @@ public class EmailServiceImpl implements EmailService {
                 resetUrl
         );
 
-        sendEmail(email, "Nhn24.store 비밀번호 변경", emailContent);
+        emailSendService.sendEmail(email, "Nhn24.store 비밀번호 변경", emailContent);
     }
 
     @Override
@@ -119,7 +109,7 @@ public class EmailServiceImpl implements EmailService {
                 resetUrl
         );
 
-        sendEmail(member.getEmail(), "Nhn24.store 휴면계정 해제", emailContent);
+        emailSendService.sendEmail(member.getEmail(), "Nhn24.store 휴면계정 해제", emailContent);
     }
 
     @Override
@@ -136,38 +126,10 @@ public class EmailServiceImpl implements EmailService {
         redisTemplate.delete(CHANGE_PASSWORD_VERIFY_EMAIL_PREFIX.concat(email));
     }
 
-    protected void sendEmail(String recipientEmail, String subject, String content) {
-        try {
-            Message message = new MimeMessage(EMAIL_SESSION);
-            message.setFrom(new InternetAddress(USERNAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject(subject);
-            message.setText(content);
-
-            Transport.send(message);
-        } catch (MessagingException messagingEx) {
-            log.error("Mail Message Error : {}", messagingEx.getMessage());
-            throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
-        }
-    }
-
-    protected String generateVerifyCode() {
+    private String generateVerifyCode() {
         Random random = new Random();
         return String.format("%06d", random.nextInt(VERIFICATION_CODE_RANGE));
     }
 
-    private Session createEmailSession() {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
 
-        // SMTP Session 생성 (싱글톤)
-        return Session.getInstance(props, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(USERNAME, PASSWORD);
-            }
-        });
-    }
 }

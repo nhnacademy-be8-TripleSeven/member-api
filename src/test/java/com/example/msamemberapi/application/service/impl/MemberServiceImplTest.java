@@ -7,9 +7,11 @@ import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.Gender;
+import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
@@ -142,13 +145,16 @@ class MemberServiceImplTest {
         // Arrange
         Long memberId = 1L;
 
-        doNothing().when(memberRepository).deleteById(memberId);
+        Member member = Member.builder().id(1L).build();
+        member.addRole(MemberRole.USER);
+
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // Act
-        memberService.deleteByMemberId(memberId);
+        memberService.quitMember(memberId);
 
-        // Assert
-        verify(memberRepository, times(1)).deleteById(memberId);
+        Assertions.assertTrue(member.getRoles().contains(MemberRole.QUIT.toString()));
     }
 
     @Test
