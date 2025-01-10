@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: instance1
   data:
     redis:
       host: 133.186.241.167
@@ -73,3 +73,4 @@ server:
 logstash:
   host: 115.94.72.197
   port: 50000 # Logstash TCP input 포트
+

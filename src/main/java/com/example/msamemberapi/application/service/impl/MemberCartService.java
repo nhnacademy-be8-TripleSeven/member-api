@@ -110,7 +110,7 @@ public class MemberCartService implements CartService {
         return new ArrayList<>(hashOps.values(cartKey));
     }
 
-    private void validBookQuantity(BookDetailResponseDto bookDetails, int quantity) {
+    protected void validBookQuantity(BookDetailResponseDto bookDetails, int quantity) {
 
         if (quantity < 0 || bookDetails == null) {
             throw new CustomException(ErrorCode.BAD_REQUEST);

@@ -16,7 +16,7 @@ public interface MemberService {
     MemberDto join(JoinRequestDto joinRequestDto);
     MemberAuthInfo findByMemberId(String memberId);
     MemberAuthInfo findByMemberId(Long memberId);
-    void deleteByMemberId(Long memberId);
+    void quitMember(Long memberId);
     MemberAccountInfo getMemberAccountByPhoneNumber(String phoneNumber);
     MemberAccountInfo getMemberAccountByEmail(String email);
     void validateMatchingLoginIdAndEmail(String email, String loginId);

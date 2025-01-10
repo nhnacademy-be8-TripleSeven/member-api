@@ -24,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectInitManager {
 
+    private final static String password = "1234";
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -58,7 +59,7 @@ public class ProjectInitManager {
     private Member createAdmin() {
         MemberAccount account = MemberAccount.builder()
                 .id("admin")
-                .password(passwordEncoder.encode("admin"))
+                .password(passwordEncoder.encode(password))
                 .accountType(AccountType.ADMIN)
                 .build();
 
@@ -108,7 +109,7 @@ public class ProjectInitManager {
     private Member createInActiveMember() {
         MemberAccount account = MemberAccount.builder()
                 .id("inactive")
-                .password(passwordEncoder.encode("1234"))
+                .password(passwordEncoder.encode(password))
                 .accountType(AccountType.REGISTERED)
                 .build();
 
