@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.msamemberapi.application.service.impl.GuestCartServiceTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.355 s -- in com.example.msamemberapi.application.service.impl.GuestCartServiceTest
