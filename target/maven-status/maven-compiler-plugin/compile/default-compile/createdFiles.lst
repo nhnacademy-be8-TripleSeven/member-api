@@ -12,6 +12,7 @@ com/example/msamemberapi/application/dto/response/QMemberDto.class
 com/example/msamemberapi/application/enums/AccountType.class
 com/example/msamemberapi/application/dto/response/AddressResponseDto.class
 com/example/msamemberapi/application/dto/request/AddressRequestDto$AddressRequestDtoBuilder.class
+com/example/msamemberapi/application/entity/GradePolicy.class
 com/example/msamemberapi/application/dto/response/KakaoAddressResponseDto$RoadAddress$RoadAddressBuilder.class
 com/example/msamemberapi/application/service/impl/AddressServiceImpl.class
 com/example/msamemberapi/application/dto/response/KakaoAddressResponseDto$Meta$MetaBuilder.class
@@ -33,6 +34,7 @@ com/example/msamemberapi/application/dto/response/MemberDto.class
 com/example/msamemberapi/application/dto/request/AddressRequestDto.class
 com/example/msamemberapi/application/enums/Gender.class
 com/example/msamemberapi/application/enums/MemberGrade.class
+com/example/msamemberapi/application/dto/response/MemberGradeHistoryDto.class
 com/example/msamemberapi/application/error/ErrorCode.class
 com/example/msamemberapi/application/service/MemberService.class
 com/example/msamemberapi/application/controller/Oauth2AccountController.class
@@ -40,15 +42,18 @@ com/example/msamemberapi/application/controller/MemberController.class
 com/example/msamemberapi/application/service/KakaoAddressService.class
 com/example/msamemberapi/application/entity/QMember.class
 com/example/msamemberapi/common/config/db/error/KeyManagerException.class
+com/example/msamemberapi/application/repository/GradePolicyRepository.class
 com/example/msamemberapi/application/repository/querydsl/impl/MemberRepositoryCustomImpl.class
 com/example/msamemberapi/application/controller/AccountController.class
 com/example/msamemberapi/common/actuator/ApplicationStatus.class
 com/example/msamemberapi/application/dto/response/BookDetailResponseDto.class
+com/example/msamemberapi/application/entity/QGradePolicy.class
 com/example/msamemberapi/application/entity/QUser.class
 com/example/msamemberapi/common/config/init/ProjectInitManager.class
 com/example/msamemberapi/application/dto/response/MemberAddressResponseDto$MemberAddressResponseDtoBuilder.class
 com/example/msamemberapi/application/dto/response/MemberAuthInfo.class
 com/example/msamemberapi/common/config/db/DatabaseCredentials.class
+com/example/msamemberapi/application/dto/response/MemberGradeDto$MemberGradeDtoBuilder.class
 com/example/msamemberapi/application/entity/MemberAddress.class
 com/example/msamemberapi/application/service/EmailSendService.class
 com/example/msamemberapi/application/feign/BookFeignClient.class
@@ -63,8 +68,10 @@ com/example/msamemberapi/application/dto/request/UpdatePasswordRequestDto.class
 com/example/msamemberapi/application/dto/response/KakaoAddressResponseDto$Meta.class
 com/example/msamemberapi/application/repository/MemberRepository.class
 com/example/msamemberapi/common/config/async/AsyncConfig.class
+com/example/msamemberapi/application/repository/MemberGradeHistoryRepository.class
 com/example/msamemberapi/application/controller/AddressController.class
 com/example/msamemberapi/application/service/MemberAddressService.class
+com/example/msamemberapi/application/dto/response/MemberGradeHistoryDto$MemberGradeHistoryDtoBuilder.class
 com/example/msamemberapi/application/service/impl/MemberCartService.class
 com/example/msamemberapi/application/controller/MemberAddressController.class
 com/example/msamemberapi/application/dto/response/KeyResponseDto.class
@@ -74,6 +81,7 @@ com/example/msamemberapi/application/entity/Member$MemberBuilder.class
 com/example/msamemberapi/common/annotations/secure/SecureKeyAnnotationProcessor.class
 com/example/msamemberapi/application/service/impl/MemberAddressServiceImpl.class
 com/example/msamemberapi/application/dto/response/MemberAccountInfo.class
+com/example/msamemberapi/application/entity/GradePolicy$GradePolicyBuilder.class
 com/example/msamemberapi/application/error/GlobalExHandler.class
 com/example/msamemberapi/application/controller/MemberManageController.class
 com/example/msamemberapi/common/actuator/CustomHealthIndicator.class
@@ -105,6 +113,7 @@ com/example/msamemberapi/application/dto/request/JoinRequestDto.class
 com/example/msamemberapi/application/dto/response/KeyResponseDto$Header.class
 com/example/msamemberapi/application/dto/response/MemberDto$MemberDtoBuilder.class
 com/example/msamemberapi/common/config/password/PasswordEncoderConfig.class
+com/example/msamemberapi/application/dto/response/MemberGradeDto.class
 com/example/msamemberapi/application/dto/response/MemberAddressResponseDto.class
 com/example/msamemberapi/common/annotations/secure/SecureKey.class
 com/example/msamemberapi/application/dto/request/MemberUpdateRequestDto.class

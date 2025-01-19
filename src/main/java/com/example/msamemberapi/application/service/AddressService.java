@@ -12,7 +12,7 @@ public interface AddressService {
     AddressResponseDto createAddress(Long userId, AddressRequestDto requestDto);
     AddressResponseDto updateAddress(Long id, AddressRequestDto requestDto);
     void deleteAddress(Long id);
-    void saveAddressFromKakao(String userId, String query, String alias, String detailAddress);
+    void saveAddressFromKakao(Long userId, String query, String alias, String detailAddress);
     List<KakaoAddressResponseDto.Document> searchRoadAddress(String keyword);
     boolean isAddressOwnedByUser(Long addressId, Long userId);
     AddressResponseDto addOrUpdateAddress(Long userId, Address updatedData);

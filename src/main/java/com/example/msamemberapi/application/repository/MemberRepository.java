@@ -12,20 +12,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
-
-    Optional<Member> findByMemberAccount_Id(String memberAccountId);
     Optional<Member> findByUserPhoneNumber(String phoneNumber);
     Optional<Member> findByEmail(String email);
+    Optional<Member> findByMemberAccount_Id(String memberAccountId);
 
     boolean existsByMemberAccount_Id(String memberAccountId);
+
 
     boolean existsByEmail(String email);
     boolean existsByUserPhoneNumber(String phoneNumber);
 
     Page<Member> findByEmailContaining(String email, Pageable pageable);
 
-    @Query("SELECT m FROM Member m WHERE m.user.name LIKE %:name%")
-    List<Member> findByUserNameContaining(@Param("name") String name, Pageable pageable);
 }
-
 

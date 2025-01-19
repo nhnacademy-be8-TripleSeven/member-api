@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Dictionary;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class KakaoAddressResponseDto {
 
     @JsonProperty("documents")
@@ -15,6 +19,10 @@ public class KakaoAddressResponseDto {
 
     @JsonProperty("meta")
     private Meta meta;
+
+    public Dictionary<Object, Object> getDocuments(List<Document> document) {
+        return null;
+    }
 
     @Getter
     @NoArgsConstructor

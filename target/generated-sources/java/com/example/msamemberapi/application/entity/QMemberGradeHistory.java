@@ -22,9 +22,9 @@ public class QMemberGradeHistory extends EntityPathBase<MemberGradeHistory> {
 
     public static final QMemberGradeHistory memberGradeHistory = new QMemberGradeHistory("memberGradeHistory");
 
-    public final DateTimePath<java.util.Date> createdAt = createDateTime("createdAt", java.util.Date.class);
+    public final DatePath<java.time.LocalDate> createdAt = createDate("createdAt", java.time.LocalDate.class);
 
-    public final EnumPath<com.example.msamemberapi.application.enums.MemberGrade> grade = createEnum("grade", com.example.msamemberapi.application.enums.MemberGrade.class);
+    public final QGradePolicy gradePolicy;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -48,6 +48,7 @@ public class QMemberGradeHistory extends EntityPathBase<MemberGradeHistory> {
 
     public QMemberGradeHistory(Class<? extends MemberGradeHistory> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.gradePolicy = inits.isInitialized("gradePolicy") ? new QGradePolicy(forProperty("gradePolicy")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
     }
 

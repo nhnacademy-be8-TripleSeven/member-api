@@ -5,10 +5,11 @@ import com.example.msamemberapi.application.dto.response.AddressResponseDto;
 import com.example.msamemberapi.application.dto.response.KakaoAddressResponseDto;
 import com.example.msamemberapi.application.entity.Address;
 import com.example.msamemberapi.application.entity.Member;
+import com.example.msamemberapi.application.entity.MemberAddress;
 import com.example.msamemberapi.application.repository.AddressRepository;
+import com.example.msamemberapi.application.repository.MemberAddressRepository;
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.AddressService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,12 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +30,7 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
     private final WebClient webClient;
     private final MemberRepository memberRepository;
+    private final MemberAddressRepository memberAddressRepository;
 
 
     @Value("${kakao.api.key}")
@@ -66,26 +65,31 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponseDto createAddress(Long userId, AddressRequestDto requestDto) {
-        if (requestDto == null ||
-                requestDto.getPostcode() == null ||
-                requestDto.getRoadAddress() == null ||
-                requestDto.getAlias() == null) {
-            throw new IllegalArgumentException("필수 값이 누락되었습니다.");
-        }
-
+        // 1. Member 조회
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+        // 2. Address 객체 생성 및 저장
         Address address = Address.builder()
-                .member(member)
+                .member(member)  // 회원과 연결
                 .alias(requestDto.getAlias())
                 .roadAddress(requestDto.getRoadAddress())
                 .postcode(requestDto.getPostcode())
                 .detailAddress(requestDto.getDetailAddress())
-                .isDefault(requestDto.getIsDefault() != null ? requestDto.getIsDefault() : false)
+                .isDefault(requestDto.getIsDefault() != null && requestDto.getIsDefault())
                 .build();
-
         Address savedAddress = addressRepository.save(address);
+
+        // 3. MemberAddress 생성 및 저장
+        MemberAddress memberAddress = MemberAddress.builder()
+                .member(member)
+                .address(savedAddress)
+                .alias(requestDto.getAlias())
+                .isDefault(requestDto.getIsDefault() != null && requestDto.getIsDefault())
+                .build();
+        memberAddressRepository.save(memberAddress);
+
+        // 4. Member와 연계 완료된 AddressResponse 반환
         return AddressResponseDto.fromEntity(savedAddress);
     }
 
@@ -117,13 +121,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    @Transactional
-    public void saveAddressFromKakao(String userId, String query, String alias, String detailAddress) {
+    public void saveAddressFromKakao(Long userId, String query, String alias, String detailAddress) {
         log.info("카카오 주소 저장 로직 시작. userId: {}, query: {}", userId, query);
 
-        Long userIdLong = Long.parseLong(userId);
-        Member member = memberRepository.findById(userIdLong)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
 
         List<KakaoAddressResponseDto.Document> documents = searchRoadAddress(query);
         if (documents.isEmpty()) {
@@ -150,6 +152,7 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.save(address);
         log.info("주소 저장 성공. userId: {}, query: {}", userId, query);
     }
+
 
     @Override
     public List<KakaoAddressResponseDto.Document> searchRoadAddress(String keyword) {
@@ -225,4 +228,6 @@ public class AddressServiceImpl implements AddressService {
             return AddressResponseDto.fromEntity(savedAddress);
         }
     }
+
+
 }

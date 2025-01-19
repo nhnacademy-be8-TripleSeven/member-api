@@ -24,6 +24,7 @@ public class Address {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    
     @Column(nullable = true)
     private String postcode;
 

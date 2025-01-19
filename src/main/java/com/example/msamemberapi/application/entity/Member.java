@@ -43,10 +43,21 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
+    private List<MemberAddress> memberAddresses = new ArrayList<>();
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
+
+    
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
     private String name;
     private String phone;
+    private String postcode;
+    private String address;
+    private String detailAddress;
 
 
     @ElementCollection(fetch = FetchType.LAZY) @Builder.Default
@@ -75,10 +86,6 @@ public class Member {
         this.email = email;
         this.phone = phone;
     }
-
-    private String postcode;
-    private String address;
-    private String detailAddress;
 
     public void updateEmail(String email) {
         if (email == null || email.isEmpty()) {
@@ -166,8 +173,8 @@ public class Member {
         }
     }
 
-    public MemberAddress createMemberAddress(Address address, @NotNull @NotBlank(message = "별칭을 적어주세요.")
-    @Size(max = 50) String alias, @NotNull Boolean isDefault) {
+
+    public MemberAddress createMemberAddress(Address address, String alias, Boolean isDefault) {
         if (address == null) {
             throw new IllegalArgumentException("주소는 필수 입력 항목입니다.");
         }
@@ -177,8 +184,6 @@ public class Member {
         if (isDefault == null) {
             throw new IllegalArgumentException("isDefault 값은 필수 입력 항목입니다.");
         }
-
-
         return MemberAddress.builder()
                 .member(this)
                 .address(address)
@@ -186,6 +191,7 @@ public class Member {
                 .isDefault(isDefault)
                 .build();
     }
+
 
 
     public void update(String name, String email, String phoneNumber) {
@@ -216,4 +222,15 @@ public class Member {
         }
     }
 
+    public Member(Long id, String name, String email, String phoneNumber) {
+
+    }
+
+    public void update(String email, String phoneNumber, String address, String detailAddress) {
+    }
+
+    public void updateGrade(MemberGrade grade) {
+        this.memberGrade = grade;
+
+    }
 }

@@ -1,45 +1,42 @@
+// GradePolicy.java
 package com.example.msamemberapi.application.entity;
 
 import com.example.msamemberapi.application.enums.MemberGrade;
 import jakarta.persistence.*;
-import lombok.*;
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="grade")
 public class GradePolicy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private MemberGrade grade;
 
-    @Column(nullable = false)
-    private Integer min; // 최소 금액
+    @Column(name="description", nullable = false)
+    private String description;
 
-    @Column
-    private Integer max; // 최대 금액
+    private BigDecimal rate;
 
-    @Column(nullable = false)
-    private Double rate;
+    private int min;
 
-    public String getName() {
-        return grade.name();
-    }
+    private int max;
 
-    public boolean isWithinRange(int spending) {
-        return spending >= min && (max == null || spending < max);
-    }
-
-    @Builder
-    public GradePolicy(MemberGrade grade, Integer min, Integer max, Double rate) {
-        this.grade = grade;
-        this.min = min;
-        this.max = max;
-        this.rate = rate;
+    public static GradePolicy addGradePolicy(String name, MemberGrade grade, String description, BigDecimal rate, int min, int max) {
+        return new GradePolicy(null, name, grade, description, rate, min, max);
     }
 }

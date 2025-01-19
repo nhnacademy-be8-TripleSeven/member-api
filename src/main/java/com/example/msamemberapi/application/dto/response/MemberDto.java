@@ -48,15 +48,15 @@ public class MemberDto {
 
     @QueryProjection
     public MemberDto(Long id, String email, String phoneNumber, String name, Date birth,
-                     Gender gender, MemberGrade memberGrade) {
+                     Gender gender, MemberGrade memberGrade, Integer points) {
         this.id = id;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.birth = birth;
-        this.gender = gender.name();
-        this.memberGrade = memberGrade.name();
-
+        this.gender = gender != null ? gender.name() : "UNKNOWN";
+        this.memberGrade = memberGrade != null ? memberGrade.name() : "REGULAR";
+        this.points = points != null ? points : 0;
     }
 
     public MemberDto(Member member) {
@@ -70,11 +70,15 @@ public class MemberDto {
         this.points = member.getUser() != null ? member.getUser().getPoints() : 0;
     }
 
+
+
     public static MemberDto fromEntity(Member member) {
         return MemberDto.builder()
                 .id(member.getId())
                 .name(member.getName())
                 .email(member.getEmail())
+                .memberGrade(member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR")
+                .points(member.getUser() != null ? member.getUser().getPoints() : 0)
                 .build();
     }
 }

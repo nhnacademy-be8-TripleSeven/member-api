@@ -24,11 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Member-Address", description = "회원 주소 API")
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/members/{memberId}/addresses")
+@RequestMapping("/api/members/{memberId}/addresses")
 public class MemberAddressController {
 
     private final MemberAddressService memberAddressService;
+
+    public MemberAddressController(MemberAddressService memberAddressService) {
+        this.memberAddressService = memberAddressService;
+    }
 
     @Operation(summary = "회원 주소 조회", description = "특정 회원의 모든 주소 조회")
     @ApiResponses(value = {
@@ -50,14 +53,12 @@ public class MemberAddressController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping
-    public ResponseEntity<MemberAddressResponseDto> addAddressToMember(
-            @PathVariable Long memberId,
-            @Valid @RequestBody MemberAddressRequestDto requestDto) {
+    public ResponseEntity<MemberAddressResponseDto> addAddressToMember(@PathVariable Long memberId, @RequestBody MemberAddressRequestDto requestDto) {
         MemberAddressResponseDto addedAddress = memberAddressService.addAddressToMember(memberId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedAddress);
     }
 
-    
+
     @Operation(summary = "회원 주소 삭제", description = "회원의 특정 주소 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "주소 삭제 성공"),
@@ -73,16 +74,10 @@ public class MemberAddressController {
 
     @PatchMapping("/{addressId}")
     @Operation(summary = "주소 별칭 및 기본 주소 수정", description = "특정 주소의 별칭과 기본 주소 여부를 수정합니다.")
-    public ResponseEntity<Void> updateAliasAndDefault(
-            @PathVariable Long memberId,
-            @PathVariable Long addressId,
-            @RequestBody Map<String, Object> request) {
-
+    public ResponseEntity<Void> updateAliasAndDefault(@PathVariable Long memberId, @PathVariable Long addressId, @RequestBody Map<String, Object> request) {
         String alias = (String) request.get("alias");
         Boolean isDefault = (Boolean) request.get("isDefault");
-
         memberAddressService.updateAlias(addressId, alias, isDefault);
-
         return ResponseEntity.ok().build();
     }
 }

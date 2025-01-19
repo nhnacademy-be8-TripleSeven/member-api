@@ -17,6 +17,7 @@ import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.feign.OrderFeignClient;
 import com.example.msamemberapi.application.repository.GradePolicyRepository;
 import com.example.msamemberapi.application.repository.MemberGradeHistoryRepository;
 import com.example.msamemberapi.application.repository.MemberRepository;
@@ -32,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -44,6 +44,7 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final GradePolicyRepository gradePolicyRepository;
     private final MemberGradeHistoryRepository memberGradeHistoryRepository;
+    private final OrderFeignClient orderFeignClient;
 
 
     @Override
@@ -192,17 +193,36 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public MemberDto getMember(Long id) {
-        return memberRepository.findById(id)
-                .map(this::mapToResponseDto)
-                .orElseThrow(() -> new RuntimeException("Member not found with id: " + id));
+    @Transactional(readOnly = true)
+    public MemberDto getMember(Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+
+        User user = member.getUser();
+        return MemberDto.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .phoneNumber(member.getPhone())
+                .points(user.getPoints())  // 포인트 추가
+                .memberGrade(user.getMembership().name())  // 멤버십 등급 추가
+                .build();
     }
 
-    @Override
-    public void updateMember(Long id, MemberDto memberDto) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found with id: " + id));
-        member.update(memberDto.getName(), memberDto.getEmail(), memberDto.getPhoneNumber());
+    public void updateMember(Long userId, MemberDto memberDto) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+
+        // 비밀번호가 존재하면 암호화하여 업데이트
+        if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
+            member.getMemberAccount().changePassword(encodedPassword); // 기존의 비밀번호를 새로운 비밀번호로 교체
+        }
+
+        // 이메일, 전화번호, 주소 등의 업데이트 처리
+        member.update(memberDto.getEmail(), memberDto.getPhoneNumber(), memberDto.getAddress(),
+                memberDto.getDetailAddress());
+
         memberRepository.save(member);
     }
 
@@ -214,26 +234,36 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.deleteById(id);
     }
 
+    @Override
     @Transactional
-    public void updateMemberInfo(String memberId, MemberDto memberDto) {
-        Member member = memberRepository.findByMemberAccount_Id(memberId)
+    public MemberDto updateMemberInfo(Long userId, MemberDto memberDto) {
+        // userId를 사용하여 회원 정보 조회
+        Member member = memberRepository.findById(userId)  // userId를 사용하여 Member 조회
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
+        // 이메일 업데이트
         if (memberDto.getEmail() != null && !memberDto.getEmail().isEmpty()) {
             member.updateEmail(memberDto.getEmail());
         }
+        // 이름 업데이트
         if (memberDto.getName() != null && !memberDto.getName().isEmpty()) {
             member.updateName(memberDto.getName());
         }
+        // 전화번호 업데이트
         if (memberDto.getPhoneNumber() != null && !memberDto.getPhoneNumber().isEmpty()) {
             member.updatePhoneNumber(memberDto.getPhoneNumber());
         }
+        // 비밀번호 업데이트
         if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
             member.updatePassword(encodedPassword);
         }
 
+        // 수정된 내용 저장
         memberRepository.save(member);
+
+        // 반환 시 mapToResponseDto를 사용하여 MemberDto 반환
+        return mapToResponseDto(member);
     }
 
     private MemberDto mapToResponseDto(Member member) {
@@ -243,6 +273,14 @@ public class MemberServiceImpl implements MemberService {
                 .email(member.getEmail())
                 .phoneNumber(member.getPhone())
                 .build();
+    }
+
+    @Override
+    public boolean verifyPassword(Long memberId, String password) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+
+        return passwordEncoder.matches(password, member.getMemberAccount().getPassword());
     }
 
     @Override
@@ -259,18 +297,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberDto findMemberInfoByUserId(String userId) {
-        Member member = memberRepository.findByMemberAccount_Id(userId)
+    public MemberDto findMemberInfoByUserId(Long userId) {
+        Member member = memberRepository.findByMemberAccount_Id(String.valueOf(userId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
         return new MemberDto(member);
     }
 
+
     @Override
+    @Transactional
     public MemberGradeDto getMemberGrade(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
-        // 최근 3개월 순수 소비 금액 계산
         int spending = calculateSpending(memberId);
 
         // 현재 등급과 다음 등급 계산
@@ -286,19 +325,65 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MemberGradeHistoryDto> getGradeHistory(Long memberId) {
         List<MemberGradeHistory> history = memberGradeHistoryRepository.findByMemberId(memberId);
 
         return history.stream()
                 .map(record -> MemberGradeHistoryDto.builder()
                         .gradeName(record.getGradePolicy().getName())
-                        .changedDate(record.getCreatedAt()) // 필드 이름 수정
+                        .changedDate(record.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
     }
 
     private int calculateSpending(Long memberId) {
-        // TODO: 최근 3개월간의 주문 데이터를 조회하여 순수 소비 금액을 합산합니다.
-        return 300000; //  임시 값
+        // 최근 3개월간의 주문 데이터를 조회하여 순수 소비 금액을 합산합니다.
+        return 300000; // 임시 값
     }
+
+
+    @Override
+    public MemberDto getMemberInfo(Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
+
+        return new MemberDto(member);
+    }
+
+    @Override
+    public void saveMember(Member member) {
+        memberRepository.save(member);
+    }
+
+    @Override
+    public Member getMemberById(Long userId) {
+        return memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));  // 예외처리 추가
+    }
+
+
+    @Override
+    @Transactional
+    public void updateMemberGrade() {
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+
+            Long amount = orderFeignClient.getNetAmount(member.getId());
+            List<GradePolicy> gradePolicies = gradePolicyRepository.findAll();
+            MemberGrade grade = MemberGrade.REGULAR;
+
+            for (GradePolicy gradePolicy : gradePolicies) {
+                int min = gradePolicy.getMin();
+                int max = gradePolicy.getMax();
+                if (min <= amount && amount < max) {
+                    grade = gradePolicy.getGrade();
+                }
+            }
+
+            member.updateGrade(grade);
+        }
+    }
+
+
 }

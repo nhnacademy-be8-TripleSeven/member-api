@@ -60,25 +60,42 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     @Override
     @Transactional
     public MemberAddressResponseDto addAddressToMember(Long memberId, MemberAddressRequestDto requestDto) {
+        // 1. 회원 정보 확인
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
+        // 2. 기본 주소 처리
         if (Boolean.TRUE.equals(requestDto.getIsDefault())) {
             resetDefaultAddress(memberId);
         }
 
+        // 3. 주소 객체 생성 및 저장
         Address address = Address.builder()
+                .member(member)
                 .postcode(requestDto.getPostalCode())
                 .roadAddress(requestDto.getRoadAddress())
                 .detailAddress(requestDto.getDetail())
                 .alias(requestDto.getAlias())
+                .isDefault(requestDto.getIsDefault())
                 .build();
 
-        addressRepository.save(address);
+        addressRepository.save(address);  // Address 저장
 
-        MemberAddress memberAddress = member.createMemberAddress(address, requestDto.getAlias(), requestDto.getIsDefault());
-        memberAddressRepository.save(memberAddress);
+        // 4. MemberAddress 객체 생성 및 저장
+        MemberAddress memberAddress = MemberAddress.builder()
+                .member(member)
+                .address(address)  // address_id가 연결되어야 함
+                .alias(requestDto.getAlias())
+                .isDefault(requestDto.getIsDefault())
+                .build();
 
+        memberAddressRepository.save(memberAddress);  // MemberAddress 저장
+
+        // 로그 추가
+        logger.debug("Address 저장 성공. Address ID: {}", address.getId());  // Address ID 확인
+        logger.debug("MemberAddress 저장 성공. MemberAddress ID: {}", memberAddress.getId());  // MemberAddress ID 확인
+
+        // 5. 응답 DTO 반환
         return new MemberAddressResponseDto(
                 memberAddress.getId(),
                 requestDto.getAlias(),
@@ -88,6 +105,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
                 requestDto.getIsDefault()
         );
     }
+
 
     @Override
     @Transactional
