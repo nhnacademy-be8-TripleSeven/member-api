@@ -13,7 +13,7 @@ public enum ErrorCode {
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "일치하는 계정이 없습니다"),
     INVALID_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED, "인증 코드가 일치하지 않습니다."),
-
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다"),
     /* 403 FORBIDDEN : 권한이 없는 사용자 */
     INVALIDATE_EMAIL(HttpStatus.FORBIDDEN, "인증되지 않은 이메일 입니다."),
 
@@ -21,6 +21,7 @@ public enum ErrorCode {
     ACCOUNT_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 계정이 없습니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 이메일이 없습니다."),
     PHONE_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 핸드폰번호가 없습니다."),
+    GRADE_POLICY_NOT_FOUND(HttpStatus.NOT_FOUND,"등급 정책을 찾을 수 없습니다."),
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     ALREADY_EXIST_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 로그인 아이디입니다."),

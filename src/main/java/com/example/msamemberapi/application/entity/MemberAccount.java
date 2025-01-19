@@ -34,4 +34,11 @@ public class MemberAccount {
     public void updateLastLoggedInAt() {
         this.lastLoggedInAt = LocalDateTime.now();
     }
+
+    public void updatePassword(String password) {
+        if (password != null && !password.isEmpty()) {
+            this.password = password;
+        }
+    }
 }
+

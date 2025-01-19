@@ -5,11 +5,14 @@ import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
+import com.example.msamemberapi.application.dto.response.MemberGradeDto;
+import com.example.msamemberapi.application.dto.response.MemberGradeHistoryDto;
+import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.enums.MemberGrade;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Collection;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface MemberService {
 
@@ -24,4 +27,26 @@ public interface MemberService {
 
     Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable);
     void updateLastLoggedInAt(Long userId);
+
+
+    MemberDto getMember(Long id);
+    void updateMember(Long id, MemberDto memberDto);
+    void deleteMember(Long id);
+
+    MemberDto findMemberInfoByUserId(Long s);
+    boolean verifyPassword(Long memberId, String password);
+
+    MemberGradeDto getMemberGrade(Long memberId);
+    List<MemberGradeHistoryDto> getGradeHistory(Long memberId);
+
+    MemberDto getMemberInfo(Long userId);
+    void saveMember(Member member);
+
+    Member getMemberById(Long userId);
+
+
+    MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
+
+    @Transactional
+    void updateMemberGrade();
 }

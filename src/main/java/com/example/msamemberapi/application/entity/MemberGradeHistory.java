@@ -1,13 +1,12 @@
 package com.example.msamemberapi.application.entity;
 
-import com.example.msamemberapi.application.enums.MemberGrade;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,11 +15,18 @@ import java.util.Date;
 @Builder
 public class MemberGradeHistory {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date createdAt;
-    @Enumerated(EnumType.STRING)
-    private MemberGrade grade;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grade_policy_id", nullable = false)
+    private GradePolicy gradePolicy;
+
+    @Column(nullable = false)
+    private LocalDate createdAt;
 }
