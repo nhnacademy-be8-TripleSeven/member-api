@@ -23,10 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -121,6 +118,15 @@ public class MemberServiceImpl implements MemberService {
     public void updateLastLoggedInAt(Long userId) {
         Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
         member.getMemberAccount().updateLastLoggedInAt();
+    }
+
+    @Override
+    public MemberDto getMemberById(Long memberId) {
+        Optional<Member> member =  memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+        return new MemberDto(member.get());
     }
 
     @Override

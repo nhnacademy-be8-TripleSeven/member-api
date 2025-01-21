@@ -27,7 +27,7 @@ public class MemberController {
     })
     @GetMapping("/info")
     public MemberDto getMemberInfo(@RequestHeader("X-USER") Long userId) {
-        return null;
+        return memberService.getMemberById(userId);
     }
 
 

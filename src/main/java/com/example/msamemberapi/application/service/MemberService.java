@@ -9,7 +9,6 @@ import com.example.msamemberapi.application.enums.MemberGrade;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
 
 public interface MemberService {
 
@@ -24,4 +23,5 @@ public interface MemberService {
 
     Page<MemberDto> getMembers(String name, MemberGrade memberGrade, Pageable pageable);
     void updateLastLoggedInAt(Long userId);
+    MemberDto getMemberById(Long memberId);
 }
