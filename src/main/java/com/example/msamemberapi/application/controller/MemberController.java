@@ -52,7 +52,6 @@ public class MemberController {
             @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-
     @GetMapping("/info")
     public ResponseEntity<MemberDto> getMemberInfo(@RequestHeader("X-USER") Long userId) {
         MemberDto memberInfo = memberService.getMemberInfo(userId);

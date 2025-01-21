@@ -32,9 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +64,8 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
         return new MemberAuthInfo(member);
     }
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -125,6 +125,15 @@ public class MemberServiceImpl implements MemberService {
     public void updateLastLoggedInAt(Long userId) {
         Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
         member.getMemberAccount().updateLastLoggedInAt();
+    }
+
+    @Override
+    public MemberDto getMemberDTOById(Long memberId) {
+        Optional<Member> member =  memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+        return new MemberDto(member.get());
     }
 
     @Override
@@ -354,5 +363,15 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    private boolean hasRole(List<String> roles, String roleValue) {
 
+        for (String role : roles) {
+            if (role.contains(roleValue)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
+
