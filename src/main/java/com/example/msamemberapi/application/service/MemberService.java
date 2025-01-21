@@ -30,11 +30,13 @@ public interface MemberService {
 
 
     MemberDto getMember(Long id);
-    void updateMember(Long id, MemberDto memberDto);
+
     void deleteMember(Long id);
 
     MemberDto findMemberInfoByUserId(Long s);
     boolean verifyPassword(Long memberId, String password);
+    MemberDto updateMember(Long userId, MemberDto memberDto);
+    MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
 
     MemberGradeDto getMemberGrade(Long memberId);
     List<MemberGradeHistoryDto> getGradeHistory(Long memberId);
@@ -43,9 +45,6 @@ public interface MemberService {
     void saveMember(Member member);
 
     Member getMemberById(Long userId);
-
-
-    MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
 
     @Transactional
     void updateMemberGrade();

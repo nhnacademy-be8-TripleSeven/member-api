@@ -7,13 +7,11 @@ import com.example.msamemberapi.application.entity.Address;
 import java.util.List;
 
 public interface AddressService {
-    List<AddressResponseDto> getAllAddressesByUserId(Long userId);
+    List<AddressResponseDto> getAllAddressesById(Long memberId);
     AddressResponseDto findAddressById(Long addressId);
     AddressResponseDto createAddress(Long userId, AddressRequestDto requestDto);
     AddressResponseDto updateAddress(Long id, AddressRequestDto requestDto);
     void deleteAddress(Long id);
-    void saveAddressFromKakao(Long userId, String query, String alias, String detailAddress);
+    void saveAddressFromKakao(Long memberId, String query, String alias, String detailAddress);
     List<KakaoAddressResponseDto.Document> searchRoadAddress(String keyword);
-    boolean isAddressOwnedByUser(Long addressId, Long userId);
-    AddressResponseDto addOrUpdateAddress(Long userId, Address updatedData);
 }

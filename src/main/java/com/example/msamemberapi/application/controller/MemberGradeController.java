@@ -7,6 +7,7 @@ import com.example.msamemberapi.application.entity.GradePolicy;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.repository.GradePolicyRepository;
 import com.example.msamemberapi.application.service.GradePolicyService;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +66,8 @@ public class MemberGradeController {
                 MemberGrade.valueOf(gradeRequestDto.getName().toUpperCase()),
                 gradeRequestDto.getDescription(),
                 gradeRequestDto.getRate(),
-                gradeRequestDto.getMin()
+                gradeRequestDto.getMin(),
+                gradeRequestDto.getMax()
         );
         return ResponseEntity.status(201).body(memberGradeDto);
     }

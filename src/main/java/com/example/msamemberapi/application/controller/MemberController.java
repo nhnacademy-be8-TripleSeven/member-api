@@ -93,20 +93,11 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PutMapping("/{userId}/edit")
-    public ResponseEntity<MemberDto> updateMember(@PathVariable Long userId,
-                                                  @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
-        Member member = memberService.getMemberById(userId);
-
-        if (memberUpdateRequestDto.getNewPassword() != null && !memberUpdateRequestDto.getNewPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(memberUpdateRequestDto.getNewPassword());
-            member.updatePassword(encodedPassword);
-        }
-
-        member.update(memberUpdateRequestDto.getEmail(), memberUpdateRequestDto.getPhone(),
-                memberUpdateRequestDto.getAddress(), memberUpdateRequestDto.getDetailAddress());
-        memberService.saveMember(member);
-
-        return ResponseEntity.ok(new MemberDto(member));
+    public ResponseEntity<MemberDto> updateMember(
+            @PathVariable Long userId,
+            @RequestBody @Valid MemberUpdateRequestDto requestDto) {
+        MemberDto updatedMember = memberService.updateMember(userId, requestDto.toMemberDto());
+        return ResponseEntity.ok(updatedMember);
     }
 
     @GetMapping("/verify-password")
@@ -116,25 +107,22 @@ public class MemberController {
         return "verify-password";
     }
 
+
+
     @Operation(summary = "비밀번호 검증", description = "사용자가 입력한 비밀번호를 검증")
-    @PostMapping("/api/members/{userId}/verify-password")
+    @PostMapping("/{userId}/verify-password")
     public ResponseEntity<?> checkPassword(
             @PathVariable Long userId,
-            @RequestBody Map<String, String> payload,
-            HttpSession session) {
+            @RequestBody Map<String, String> payload) {
         String password = payload.get("password");
-
         boolean isValid = memberService.verifyPassword(userId, password);
         if (!isValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 틀렸습니다.");
         }
 
-        session.setAttribute("passwordVerified", true);
-
-        String redirectUrl = (String) session.getAttribute("redirectAfterPasswordCheck");
-        session.removeAttribute("redirectAfterPasswordCheck");
-        return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/frontend/member/edit");
+        return ResponseEntity.ok("비밀번호 검증 성공");
     }
+
 
     @Operation(summary = "멤버 정보 수정", description = "사용자가 자신의 정보를 수정")
     @PostMapping("/edit")
@@ -162,63 +150,4 @@ public class MemberController {
     }
 
 
-    @Operation(summary = "비밀번호 확인 페이지 반환", description = "비밀번호 확인 페이지")
-    @GetMapping("/frontend/pwd-check")
-    public String getPasswordCheckPage(HttpSession session) {
-        Boolean passwordVerified = (Boolean) session.getAttribute("passwordVerified");
-        if (passwordVerified != null && passwordVerified) {
-            String redirectUrl = (String) session.getAttribute("redirectAfterPasswordCheck");
-            session.removeAttribute("redirectAfterPasswordCheck");
-            return "redirect:" + (redirectUrl != null ? redirectUrl : "/frontend/member/edit");
-        }
-        return "member/pwd-check";
-    }
-
-    @GetMapping("/frontend/member/edit")
-    public String getMemberEditPage(@RequestHeader(value = "X-USER", required = false) Long userId,
-                                    HttpSession session, Model model) {
-        if (userId == null) {
-            return "auth/login";
-        }
-
-        Boolean passwordVerified = (Boolean) session.getAttribute("passwordVerified");
-        if (passwordVerified == null || !passwordVerified) {
-            session.setAttribute("redirectAfterPasswordCheck", "/frontend/member/edit");
-            return "redirect:/frontend/member/pwd-check";
-        }
-
-        MemberDto member = memberService.getMemberInfo(userId);
-        model.addAttribute("member", member);
-        return "member/member-edit";
-    }
-
-
-    @PostMapping("/frontend/member/edit")
-    public String updateMemberInfo(@RequestHeader("X-USER") Long userId,
-                                   @ModelAttribute MemberDto memberDTO,
-                                   Model model) {
-        if (memberDTO.getName() == null || memberDTO.getEmail() == null) {
-            model.addAttribute("error", "이름과 이메일을 입력해주세요.");
-            return "member/member-edit";
-        }
-
-        memberService.updateMemberInfo(userId, memberDTO);
-        model.addAttribute("member", memberDTO);
-        return "member/member-edit";
-    }
-
-    @Operation(summary = "주소 관리 페이지", description = "주소 관리 페이지 조회")
-    @GetMapping("/{userId}/addresses/manage")
-    public String getAddressManagePage(@PathVariable Long userId,
-                                       HttpSession session, Model model) {
-        Boolean passwordVerified = (Boolean) session.getAttribute("passwordVerified");
-        if (passwordVerified == null || !passwordVerified) {
-            session.setAttribute("redirectAfterPasswordCheck", "/frontend/member/address-manage");
-            return "redirect:/frontend/member/pwd-check";  // 비밀번호 확인 후 주소 관리 페이지로 리다이렉트
-        }
-
-        List<AddressResponseDto> addresses = addressService.getAllAddressesByUserId(userId);
-        model.addAttribute("addresses", addresses);
-        return "member/address-manage";
-    }
-}
+   }

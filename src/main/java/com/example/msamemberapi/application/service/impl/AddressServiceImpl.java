@@ -47,8 +47,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AddressResponseDto> getAllAddressesByUserId(Long userId) {
-        List<Address> addresses = addressRepository.findByMemberId(userId);
+    public List<AddressResponseDto> getAllAddressesById(Long memberId) {
+        List<Address> addresses = addressRepository.findByMemberId(memberId);
         return addresses.stream()
                 .map(AddressResponseDto::fromEntity)
                 .collect(Collectors.toList());
@@ -64,14 +64,12 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressResponseDto createAddress(Long userId, AddressRequestDto requestDto) {
-        // 1. Member 조회
-        Member member = memberRepository.findById(userId)
+    public AddressResponseDto createAddress(Long memberId, AddressRequestDto requestDto) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 2. Address 객체 생성 및 저장
         Address address = Address.builder()
-                .member(member)  // 회원과 연결
+                .member(member)
                 .alias(requestDto.getAlias())
                 .roadAddress(requestDto.getRoadAddress())
                 .postcode(requestDto.getPostcode())
@@ -80,7 +78,6 @@ public class AddressServiceImpl implements AddressService {
                 .build();
         Address savedAddress = addressRepository.save(address);
 
-        // 3. MemberAddress 생성 및 저장
         MemberAddress memberAddress = MemberAddress.builder()
                 .member(member)
                 .address(savedAddress)
@@ -89,26 +86,38 @@ public class AddressServiceImpl implements AddressService {
                 .build();
         memberAddressRepository.save(memberAddress);
 
-        // 4. Member와 연계 완료된 AddressResponse 반환
         return AddressResponseDto.fromEntity(savedAddress);
     }
 
     @Override
     @Transactional
-    public AddressResponseDto updateAddress(Long id, AddressRequestDto requestDto) {
-        Address existingAddress = addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
+    public AddressResponseDto updateAddress(Long memberId, AddressRequestDto requestDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-        existingAddress.updateDetails(
-                requestDto.getRoadAddress() != null ? requestDto.getRoadAddress() : existingAddress.getRoadAddress(),
-                requestDto.getDetailAddress() != null ? requestDto.getDetailAddress() : existingAddress.getDetailAddress(),
-                requestDto.getAlias() != null ? requestDto.getAlias() : existingAddress.getAlias(),
-                requestDto.getPostcode() != null ? requestDto.getPostcode() : existingAddress.getPostcode(),
-                requestDto.getIsDefault() != null ? requestDto.getIsDefault() : existingAddress.getIsDefault()
-        );
+        Address address = requestDto.getId() != null
+                ? addressRepository.findById(requestDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("주소가 존재하지 않습니다."))
+                : new Address(member, requestDto.getPostcode(), requestDto.getRoadAddress(),
+                requestDto.getDetailAddress(), requestDto.getAlias(), requestDto.getIsDefault());
 
-        Address updatedAddress = addressRepository.save(existingAddress);
-        return AddressResponseDto.fromEntity(updatedAddress);
+        if (Boolean.TRUE.equals(requestDto.getIsDefault())) {
+            resetDefaultAddress(memberId);
+        }
+
+        address.updateDetails(requestDto.getRoadAddress(), requestDto.getDetailAddress(),
+                requestDto.getAlias(), requestDto.getPostcode(), requestDto.getIsDefault());
+
+        Address savedAddress = addressRepository.save(address);
+        return AddressResponseDto.fromEntity(savedAddress);
+    }
+
+    private void resetDefaultAddress(Long memberId) {
+        List<Address> addresses = addressRepository.findByMemberId(memberId);
+        addresses.forEach(address -> address.updateDetails(
+                address.getRoadAddress(), address.getDetailAddress(),
+                address.getAlias(), address.getPostcode(), false));
+        addressRepository.saveAll(addresses);
     }
 
     @Override
@@ -120,7 +129,9 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.deleteById(id);
     }
 
+
     @Override
+    @Transactional
     public void saveAddressFromKakao(Long userId, String query, String alias, String detailAddress) {
         log.info("카카오 주소 저장 로직 시작. userId: {}, query: {}", userId, query);
 
@@ -148,11 +159,22 @@ public class AddressServiceImpl implements AddressService {
                 .detailAddress(detailAddress)
                 .isDefault(false)
                 .build();
-
         addressRepository.save(address);
+
+        MemberAddress memberAddress = MemberAddress.builder()
+                .member(member)
+                .address(address)
+                .alias(alias)
+                .isDefault(false)
+                .build();
+        memberAddressRepository.save(memberAddress);
+
+        member.getAddresses().add(address);
+        member.getMemberAddresses().add(memberAddress);
+        memberRepository.save(member);
+
         log.info("주소 저장 성공. userId: {}, query: {}", userId, query);
     }
-
 
     @Override
     public List<KakaoAddressResponseDto.Document> searchRoadAddress(String keyword) {
@@ -167,67 +189,5 @@ public class AddressServiceImpl implements AddressService {
                 .block();
     }
 
-
-    @Override
-    public boolean isAddressOwnedByUser(Long addressId, Long userId) {
-        return addressRepository.existsByIdAndMemberId(addressId, userId);
-    }
-
-    private void validateAddressRequest(AddressRequestDto requestDto) {
-        if (requestDto == null ||
-                requestDto.getPostcode() == null ||
-                requestDto.getRoadAddress() == null ||
-                requestDto.getAlias() == null) {
-            throw new IllegalArgumentException("필수 값이 누락되었습니다.");
-        }
-    }
-
-    private Address buildAddress(AddressRequestDto requestDto, Member member, boolean isDefault) {
-        return Address.builder()
-                .member(member)
-                .roadAddress(requestDto.getRoadAddress())
-                .postcode(requestDto.getPostcode())
-                .detailAddress(requestDto.getDetailAddress())
-                .alias(requestDto.getAlias())
-                .isDefault(isDefault)
-                .build();
-    }
-
-
-    @Override
-    public AddressResponseDto addOrUpdateAddress(Long userId, Address updatedData) {
-        if (updatedData.getId() != null) {
-            Address existingAddress = addressRepository.findById(updatedData.getId())
-                    .orElseThrow(() -> new RuntimeException("Address not found"));
-
-            existingAddress.updateDetails(
-                    updatedData.getRoadAddress(),
-                    updatedData.getDetailAddress(),
-                    updatedData.getAlias(),
-                    updatedData.getPostcode(),
-                    updatedData.getIsDefault()
-            );
-
-            Address savedAddress = addressRepository.save(existingAddress);
-            return AddressResponseDto.fromEntity(savedAddress);
-        } else {
-            // 추가 로직
-            Member member = memberRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            Address newAddress = Address.builder()
-                    .member(member) // Member 객체 직접 참조
-                    .roadAddress(updatedData.getRoadAddress())
-                    .detailAddress(updatedData.getDetailAddress())
-                    .alias(updatedData.getAlias())
-                    .postcode(updatedData.getPostcode())
-                    .isDefault(updatedData.getIsDefault())
-                    .build();
-
-            Address savedAddress = addressRepository.save(newAddress);
-            return AddressResponseDto.fromEntity(savedAddress);
-        }
-    }
-
-
+    
 }

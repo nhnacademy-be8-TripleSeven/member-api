@@ -25,13 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Member-Address", description = "회원 주소 API")
 @RestController
 @RequestMapping("/api/members/{memberId}/addresses")
+@RequiredArgsConstructor
 public class MemberAddressController {
 
     private final MemberAddressService memberAddressService;
 
-    public MemberAddressController(MemberAddressService memberAddressService) {
-        this.memberAddressService = memberAddressService;
-    }
 
     @Operation(summary = "회원 주소 조회", description = "특정 회원의 모든 주소 조회")
     @ApiResponses(value = {

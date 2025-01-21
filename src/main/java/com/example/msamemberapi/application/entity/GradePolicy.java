@@ -39,4 +39,5 @@ public class GradePolicy {
     public static GradePolicy addGradePolicy(String name, MemberGrade grade, String description, BigDecimal rate, int min, int max) {
         return new GradePolicy(null, name, grade, description, rate, min, max);
     }
+
 }

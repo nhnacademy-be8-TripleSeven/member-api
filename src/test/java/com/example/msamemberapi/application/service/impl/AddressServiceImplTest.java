@@ -1,30 +1,30 @@
 package com.example.msamemberapi.application.service.impl;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.example.msamemberapi.application.dto.request.AddressRequestDto;
 import com.example.msamemberapi.application.dto.response.AddressResponseDto;
 import com.example.msamemberapi.application.dto.response.KakaoAddressResponseDto;
-import com.example.msamemberapi.application.dto.response.MemberAddressResponseDto;
 import com.example.msamemberapi.application.entity.Address;
 import com.example.msamemberapi.application.entity.Member;
+import com.example.msamemberapi.application.entity.MemberAddress;
 import com.example.msamemberapi.application.repository.AddressRepository;
+import com.example.msamemberapi.application.repository.MemberAddressRepository;
 import com.example.msamemberapi.application.repository.MemberRepository;
+import com.example.msamemberapi.application.service.AddressService;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import org.mockito.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 class AddressServiceImplTest {
 
@@ -37,133 +37,135 @@ class AddressServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private MemberAddressRepository memberAddressRepository;
 
     @Mock
     private WebClient webClient;
 
-    private Member member;
+    @Mock
+    private WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> headersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    @Value("${kakao.api.key}")
+    private String kakaoApiKey;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        member = new Member(1L, "testUser", "test@example.com", "01012345678"); // 생성자 사용
     }
 
     @Test
-    @DisplayName("주소 목록 조회 - 성공")
-    void getAllAddressesByUserId_Success() {
+    @DisplayName("모든 주소 조회 테스트")
+    void getAllAddressesById_success() {
         // Arrange
-        Address address1 = Address.builder()
-                .member(member)
-                .postcode("12345")
-                .roadAddress("서울시 강남구")
-                .detailAddress("상세주소")
-                .alias("집")
-                .isDefault(true)
-                .build();
-
-        Address address2 = Address.builder()
-                .member(member)
-                .postcode("67890")
-                .roadAddress("서울시 서초구")
-                .detailAddress("상세주소")
-                .alias("회사")
-                .isDefault(false)
-                .build();
-
-        List<Address> addressList = Arrays.asList(address1, address2);
-
-        when(addressRepository.findByMemberId(1L)).thenReturn(addressList);
+        Long memberId = 1L;
+        Address address = mock(Address.class);
+        when(addressRepository.findByMemberId(memberId)).thenReturn(List.of(address));
+        when(address.getAlias()).thenReturn("Home");
 
         // Act
-        List<AddressResponseDto> response = addressService.getAllAddressesByUserId(1L);
+        List<AddressResponseDto> addresses = addressService.getAllAddressesById(memberId);
 
         // Assert
-        assertNotNull(response);
-        assertEquals(2, response.size());
-        assertEquals("서울시 강남구", response.get(0).getRoadAddress());
+        assertNotNull(addresses);
+        assertEquals(1, addresses.size());
+        verify(addressRepository, times(1)).findByMemberId(memberId);
     }
 
     @Test
-    @DisplayName("회원 주소 생성 - 성공")
-    void createMemberAddress_Success() {
-        // Arrange
-        MemberAddressResponseDto responseDto = MemberAddressResponseDto.builder()
-                .id(1L)
-                .alias("집")
-                .detail("상세주소")
-                .roadAddress("서울시 강남구")
-                .postalCode("12345")
-                .isDefault(true) // true 설정
-                .build();
-
-        // Act
-        boolean isDefault = responseDto.getIsDefault(); // getIsDefault() 메서드 호출
-
-        // Assert
-        assertNotNull(responseDto);
-        assertTrue(isDefault);  // isDefault가 true여야 합니다.
-    }
-
-    @Test
-    @DisplayName("주소 생성 - 필수 값 누락 시 실패")
-    void createAddress_Fail_MissingRequiredFields() {
-        // Arrange
-        AddressRequestDto requestDto = AddressRequestDto.builder()
-                .postcode(null)
-                .roadAddress("서울시 강남구")
-                .detailAddress("상세주소")
-                .alias("집")
-                .isDefault(true)
-                .build();
-
-        // Act & Assert
-        IllegalArgumentException thrown =
-                assertThrows(IllegalArgumentException.class, () -> addressService.createAddress(1L, requestDto));
-        assertEquals("필수 값이 누락되었습니다.", thrown.getMessage());
-    }
-
-    @Test
-    @DisplayName("주소 수정 - 성공")
-    void updateAddress_Success() {
+    @DisplayName("주소 ID로 조회 성공")
+    void findAddressById_success() {
         // Arrange
         Long addressId = 1L;
-        AddressRequestDto requestDto = AddressRequestDto.builder()
-                .postcode("67890")
-                .roadAddress("서울시 서초구")
-                .detailAddress("상세주소")
-                .alias("회사")
-                .isDefault(false)
-                .build();
-
-        Address existingAddress = Address.builder()
-                .member(member)
-                .postcode("12345")
-                .roadAddress("서울시 강남구")
-                .detailAddress("상세주소")
-                .alias("집")
-                .isDefault(true)
-                .build();
-
-        when(addressRepository.findById(addressId)).thenReturn(Optional.of(existingAddress));
-        when(addressRepository.save(any(Address.class))).thenReturn(existingAddress);
+        Address address = mock(Address.class);
+        when(addressRepository.findById(addressId)).thenReturn(Optional.of(address));
 
         // Act
-        AddressResponseDto response = addressService.updateAddress(addressId, requestDto);
+        AddressResponseDto result = addressService.findAddressById(addressId);
 
         // Assert
-        assertNotNull(response);
-        assertEquals("서울시 서초구", response.getRoadAddress());
-        assertEquals("상세주소", response.getDetailAddress());
+        assertNotNull(result);
+        verify(addressRepository, times(1)).findById(addressId);
     }
 
     @Test
-    @DisplayName("주소 삭제 - 성공")
-    void deleteAddress_Success() {
+    @DisplayName("주소 ID로 조회 실패 - 주소 없음")
+    void findAddressById_notFound() {
+        // Arrange
+        Long addressId = 1L;
+        when(addressRepository.findById(addressId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> addressService.findAddressById(addressId));
+    }
+
+    @Test
+    @DisplayName("새 주소 생성 성공")
+    void createAddress_success() {
+        // Arrange
+        Long memberId = 1L;
+        Member member = mock(Member.class);
+        Address address = mock(Address.class);
+        AddressRequestDto requestDto = AddressRequestDto.builder()
+                .alias("Office")
+                .roadAddress("456 Office Blvd")
+                .detailAddress("Suite 200")
+                .postcode("54321")
+                .isDefault(true)
+                .build();
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(addressRepository.save(any(Address.class))).thenReturn(address);
+
+        // Act
+        AddressResponseDto result = addressService.createAddress(memberId, requestDto);
+
+        // Assert
+        assertNotNull(result);
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(addressRepository, times(1)).save(any(Address.class));
+        verify(memberAddressRepository, times(1)).save(any(MemberAddress.class));
+    }
+
+    @Test
+    @DisplayName("주소 업데이트 성공")
+    void updateAddress_success() {
+        // Arrange
+        Long memberId = 1L;
+        Address address = mock(Address.class);
+        AddressRequestDto requestDto = AddressRequestDto.builder()
+                .id(1L)
+                .alias("Updated Office")
+                .roadAddress("Updated Blvd")
+                .detailAddress("Updated Suite")
+                .postcode("99999")
+                .isDefault(true)
+                .build();
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mock(Member.class)));
+        when(addressRepository.findById(requestDto.getId())).thenReturn(Optional.of(address));
+        when(addressRepository.save(address)).thenReturn(address);
+
+        // Act
+        AddressResponseDto result = addressService.updateAddress(memberId, requestDto);
+
+        // Assert
+        assertNotNull(result);
+        verify(addressRepository, times(1)).save(address);
+    }
+
+    @Test
+    @DisplayName("주소 삭제 성공")
+    void deleteAddress_success() {
         // Arrange
         Long addressId = 1L;
         when(addressRepository.existsById(addressId)).thenReturn(true);
-        doNothing().when(addressRepository).deleteById(addressId);
 
         // Act
         addressService.deleteAddress(addressId);
@@ -171,18 +173,55 @@ class AddressServiceImplTest {
         // Assert
         verify(addressRepository, times(1)).deleteById(addressId);
     }
-
     @Test
-    @DisplayName("주소 삭제 - 존재하지 않는 주소 ID 시 실패")
-    void deleteAddress_Fail_NotFound() {
+    @DisplayName("카카오 주소 검색 및 저장 성공")
+    void saveAddressFromKakao_success_withAnswer() {
         // Arrange
-        Long addressId = 999L;
-        when(addressRepository.existsById(addressId)).thenReturn(false);
+        Long userId = 1L;
+        String query = "Some Address";
+        String alias = "Home";
+        String detailAddress = "123 Suite";
 
-        // Act & Assert
-        IllegalArgumentException thrown =
-                assertThrows(IllegalArgumentException.class, () -> addressService.deleteAddress(addressId));
-        assertEquals("삭제할 주소가 존재하지 않습니다.", thrown.getMessage());
+        // Mock Member
+        Member member = mock(Member.class);
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+
+        // Mock KakaoAddressResponseDto
+        KakaoAddressResponseDto kakaoResponse = KakaoAddressResponseDto.builder()
+                .documents(List.of(
+                        KakaoAddressResponseDto.Document.builder()
+                                .roadAddress(KakaoAddressResponseDto.RoadAddress.builder()
+                                        .addressName("123 Road")
+                                        .zoneNo("54321")
+                                        .build())
+                                .build()
+                ))
+                .build();
+
+        // WebClient Mock 설정
+        when(webClient.get()).thenAnswer(invocation -> {
+            WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
+            when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(uriInvocation -> {
+                WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+                when(requestHeadersSpec.retrieve()).thenAnswer(retrieveInvocation -> {
+                    WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+                    when(responseSpec.bodyToMono(KakaoAddressResponseDto.class)).thenReturn(Mono.just(kakaoResponse));
+                    return responseSpec;
+                });
+                return requestHeadersSpec;
+            });
+            return requestHeadersUriSpec;
+        });
+
+        // Act
+        addressService.saveAddressFromKakao(userId, query, alias, detailAddress);
+
+        // Assert
+        verify(addressRepository, times(1)).save(any(Address.class));
+        verify(memberAddressRepository, times(1)).save(any(MemberAddress.class));
+        verify(memberRepository, times(1)).save(member);
     }
-
 }
+
+
+

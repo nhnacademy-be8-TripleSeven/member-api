@@ -47,6 +47,7 @@ public class MemberServiceImpl implements MemberService {
     private final OrderFeignClient orderFeignClient;
 
 
+
     @Override
     @Transactional
     public MemberDto join(JoinRequestDto joinRequestDto) {
@@ -204,28 +205,36 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .phoneNumber(member.getPhone())
-                .points(user.getPoints())  // 포인트 추가
-                .memberGrade(user.getMembership().name())  // 멤버십 등급 추가
+                .points(user.getPoints())
+                .memberGrade(user.getMembership().name())
                 .build();
     }
 
-    public void updateMember(Long userId, MemberDto memberDto) {
+
+
+    @Override
+    @Transactional
+    public MemberDto updateMember(Long userId, MemberDto memberDto) {
+        return updateMemberInfo(userId, memberDto);
+    }
+
+    @Override
+    @Transactional
+    public MemberDto updateMemberInfo(Long userId, MemberDto memberDto) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
-        // 비밀번호가 존재하면 암호화하여 업데이트
-        if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
-            member.getMemberAccount().changePassword(encodedPassword); // 기존의 비밀번호를 새로운 비밀번호로 교체
-        }
-
-        // 이메일, 전화번호, 주소 등의 업데이트 처리
-        member.update(memberDto.getEmail(), memberDto.getPhoneNumber(), memberDto.getAddress(),
-                memberDto.getDetailAddress());
+        member.update(
+                memberDto.getEmail(),
+                memberDto.getPhoneNumber(),
+                memberDto.getAddress(),
+                memberDto.getDetailAddress(),
+                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : null
+        );
 
         memberRepository.save(member);
+        return MemberDto.fromEntity(member);
     }
-
     @Override
     public void deleteMember(Long id) {
         if (!memberRepository.existsById(id)) {
@@ -234,46 +243,6 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.deleteById(id);
     }
 
-    @Override
-    @Transactional
-    public MemberDto updateMemberInfo(Long userId, MemberDto memberDto) {
-        // userId를 사용하여 회원 정보 조회
-        Member member = memberRepository.findById(userId)  // userId를 사용하여 Member 조회
-                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
-
-        // 이메일 업데이트
-        if (memberDto.getEmail() != null && !memberDto.getEmail().isEmpty()) {
-            member.updateEmail(memberDto.getEmail());
-        }
-        // 이름 업데이트
-        if (memberDto.getName() != null && !memberDto.getName().isEmpty()) {
-            member.updateName(memberDto.getName());
-        }
-        // 전화번호 업데이트
-        if (memberDto.getPhoneNumber() != null && !memberDto.getPhoneNumber().isEmpty()) {
-            member.updatePhoneNumber(memberDto.getPhoneNumber());
-        }
-        // 비밀번호 업데이트
-        if (memberDto.getPassword() != null && !memberDto.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
-            member.updatePassword(encodedPassword);
-        }
-
-        // 수정된 내용 저장
-        memberRepository.save(member);
-
-        // 반환 시 mapToResponseDto를 사용하여 MemberDto 반환
-        return mapToResponseDto(member);
-    }
-
-    private MemberDto mapToResponseDto(Member member) {
-        return MemberDto.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .email(member.getEmail())
-                .phoneNumber(member.getPhone())
-                .build();
-    }
 
     @Override
     public boolean verifyPassword(Long memberId, String password) {
@@ -338,7 +307,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private int calculateSpending(Long memberId) {
-        // 최근 3개월간의 주문 데이터를 조회하여 순수 소비 금액을 합산합니다.
+
         return 300000; // 임시 값
     }
 
@@ -359,7 +328,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member getMemberById(Long userId) {
         return memberRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));  // 예외처리 추가
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
     }
 
 

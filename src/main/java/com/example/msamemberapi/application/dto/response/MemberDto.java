@@ -48,7 +48,7 @@ public class MemberDto {
 
     @QueryProjection
     public MemberDto(Long id, String email, String phoneNumber, String name, Date birth,
-                     Gender gender, MemberGrade memberGrade, Integer points) {
+                     Gender gender, MemberGrade memberGrade) {
         this.id = id;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -56,7 +56,6 @@ public class MemberDto {
         this.birth = birth;
         this.gender = gender != null ? gender.name() : "UNKNOWN";
         this.memberGrade = memberGrade != null ? memberGrade.name() : "REGULAR";
-        this.points = points != null ? points : 0;
     }
 
     public MemberDto(Member member) {
@@ -73,11 +72,22 @@ public class MemberDto {
 
 
     public static MemberDto fromEntity(Member member) {
+        if (member == null) {
+            throw new IllegalArgumentException("Member cannot be null");
+        }
+
         return MemberDto.builder()
                 .id(member.getId())
-                .name(member.getName())
                 .email(member.getEmail())
+                .phoneNumber(member.getUser() != null ? member.getUser().getPhoneNumber() : null)
+                .name(member.getUser() != null ? member.getUser().getName() : null)
+                .birth(member.getBirth())
+                .gender(member.getGender() != null ? member.getGender().name() : "UNKNOWN")
                 .memberGrade(member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR")
+                .postcode(member.getPostcode())
+                .address(member.getAddress())
+                .detailAddress(member.getDetailAddress())
+                .password(member.getPassword()) // Include password if needed
                 .points(member.getUser() != null ? member.getUser().getPoints() : 0)
                 .build();
     }

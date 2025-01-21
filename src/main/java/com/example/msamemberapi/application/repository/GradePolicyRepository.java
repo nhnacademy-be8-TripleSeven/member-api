@@ -24,5 +24,6 @@ public interface GradePolicyRepository extends JpaRepository<GradePolicy, Long> 
 
     @Query("SELECT g FROM GradePolicy g WHERE g.min > ?1 ORDER BY g.min ASC")
     GradePolicy findNextGrade(int spending);
+
 }
 
