@@ -43,17 +43,12 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
-    private List<MemberAddress> memberAddresses = new ArrayList<>();
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Address> addresses = new ArrayList<>();
-
-    
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
+
+
     private String name;
+
     private String phone;
     private String postcode;
     private String address;
@@ -62,6 +57,15 @@ public class Member {
 
     @ElementCollection(fetch = FetchType.LAZY) @Builder.Default
     private List<String> roles = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberAddress> memberAddresses = new ArrayList<>();
+
+    private String password;
 
     public void addRole(MemberRole memberRole) {
         roles.add(memberRole.toString());
@@ -87,102 +91,38 @@ public class Member {
         this.phone = phone;
     }
 
-    public void updateEmail(String email) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("이메일은 비어 있을 수 없습니다.");
+
+    public void update(String email, String phoneNumber, String address, String detailAddress, String password) {
+
+        if (email != null && !email.isBlank()) {
+            validateEmail(email);
+            this.email = email;
         }
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            this.phone = phoneNumber;
+        }
+        if (address != null) {
+            this.address = address;
+        }
+        if (detailAddress != null) {
+            this.detailAddress = detailAddress;
+        }
+        if (password != null && !password.isBlank()) {
+            this.password = password;
+        }
+    }
+
+    // 이메일 유효성 검사
+    private void validateEmail(String email) {
         if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
         }
-
-        this.email = email;
     }
 
-    public Member withUpdatedPhoneNumber(String phoneNumber) {
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
-            return Member.builder()
-                    .id(this.id)
-                    .email(this.email)
-                    .memberAccount(this.memberAccount)
-                    .user(this.user.withUpdatedPhoneNumber(phoneNumber))
-                    .build();
-        }
-        return this;
-    }
-
-    public void updatePassword(String password) {
-        if (this.memberAccount == null) {
-            throw new IllegalStateException("연결된 계정이 없습니다.");
-        }
-        if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException("비밀번호는 최소 8자 이상이어야 합니다.");
-        }
-        this.memberAccount.updatePassword(password);
-    }
-
-    public Member withUpdatedName(String name) {
-        if (name != null && !name.isBlank()) {
-            return Member.builder()
-                    .id(this.id)
-                    .email(this.email)
-                    .memberAccount(this.memberAccount)
-                    .user(this.user)
-                    .birth(this.birth)
-                    .gender(this.gender)
-                    .memberGrade(this.memberGrade)
-                    .postcode(this.postcode)
-                    .address(this.address)
-                    .detailAddress(this.detailAddress)
-                    .gradeHistories(this.gradeHistories)
-                    .roles(this.roles)
-                    .build();
-        }
-        return this;
-    }
-
-    public Member withUpdatedEmail(String email) {
-        if (email != null && !email.isBlank()) {
-            return Member.builder()
-                    .id(this.id)
-                    .email(email)
-                    .memberAccount(this.memberAccount)
-                    .user(this.user)
-                    .birth(this.birth)
-                    .gender(this.gender)
-                    .memberGrade(this.memberGrade)
-                    .postcode(this.postcode)
-                    .address(this.address)
-                    .detailAddress(this.detailAddress)
-                    .gradeHistories(this.gradeHistories)
-                    .roles(this.roles)
-                    .build();
-        }
-        return this;
-    }
-
-    public void updateUserDetails(String phoneNumber, String name) {
-        if (this.user == null) {
-            throw new IllegalStateException("연결된 사용자가 없습니다.");
-        }
-
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
-            this.user.updatePhoneNumber(phoneNumber);
-        }
-        if (name != null && !name.isBlank()) {
-            this.user.updateName(name);
-        }
-    }
-
-
+    // 기본 주소 생성
     public MemberAddress createMemberAddress(Address address, String alias, Boolean isDefault) {
-        if (address == null) {
-            throw new IllegalArgumentException("주소는 필수 입력 항목입니다.");
-        }
-        if (alias == null || alias.isBlank()) {
-            throw new IllegalArgumentException("별칭은 필수 입력 항목입니다.");
-        }
-        if (isDefault == null) {
-            throw new IllegalArgumentException("isDefault 값은 필수 입력 항목입니다.");
+        if (address == null || alias == null || alias.isBlank() || isDefault == null) {
+            throw new IllegalArgumentException("주소와 별칭, 기본 주소 여부는 필수 입력 항목입니다.");
         }
         return MemberAddress.builder()
                 .member(this)
@@ -193,44 +133,8 @@ public class Member {
     }
 
 
-
-    public void update(String name, String email, String phoneNumber) {
-        if (name != null && !name.isBlank()) {
-            this.name = name;
-        }
-        if (email != null && !email.isBlank()) {
-            updateEmail(email);
-        }
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
-            this.phone = phoneNumber;
-        }
-    }
-
-    public void updatePhoneNumber(String phoneNumber) {
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
-            this.phone = phoneNumber;
-        } else {
-            throw new IllegalArgumentException("전화번호는 필수 입력 항목입니다.");
-        }
-    }
-
-    public void updateName(String name) {
-        if (name != null && !name.isBlank()) {
-            this.name = name;
-        } else {
-            throw new IllegalArgumentException("이름은 필수 입력 항목입니다.");
-        }
-    }
-
-    public Member(Long id, String name, String email, String phoneNumber) {
-
-    }
-
-    public void update(String email, String phoneNumber, String address, String detailAddress) {
-    }
-
     public void updateGrade(MemberGrade grade) {
         this.memberGrade = grade;
-
     }
+
 }

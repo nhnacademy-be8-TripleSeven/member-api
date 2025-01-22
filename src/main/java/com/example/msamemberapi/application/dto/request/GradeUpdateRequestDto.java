@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class GradeUpdateRequestDto {
 
     @NotNull(message = "적립률은 필수 입력입니다.")
     @Min(value = 0)
-    private int rate;
+    private BigDecimal rate;
 
     @NotBlank(message = "등급 설명은 필수 입력입니다.")
     @Size(max = 200)
@@ -36,5 +37,7 @@ public class GradeUpdateRequestDto {
 
     private int min;
 
-    
+    private int max;
+
+
 }

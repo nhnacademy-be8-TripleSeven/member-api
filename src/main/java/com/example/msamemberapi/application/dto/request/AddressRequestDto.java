@@ -1,6 +1,10 @@
 package com.example.msamemberapi.application.dto.request;
 
 import com.example.msamemberapi.application.entity.Address;
+import com.example.msamemberapi.application.entity.Member;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +19,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AddressRequestDto {
+    /**
+     * DTO를 Address 엔티티로 변환합니다.
+     *
+     * @param memberId 회원 ID
+     * @return Address 엔티티
+     */
+
+    private Long id;
 
     @NotNull
     @NotBlank
@@ -46,9 +58,18 @@ public class AddressRequestDto {
 //                .build();
 //    }
 
-    public Address toEntity(Long userId) {
+    public AddressRequestDto(String postcode, String roadAddress, String detailAddress, String alias,
+                             Boolean isDefault) {
+        this.postcode = postcode;
+        this.roadAddress = roadAddress;
+        this.detailAddress = detailAddress;
+        this.alias = alias;
+        this.isDefault = isDefault;
+    }
+
+    public Address toEntity(Member member) {
         return Address.builder()
-                .id(userId)
+                .member(member) // Member 객체 설정
                 .postcode(this.postcode)
                 .roadAddress(this.roadAddress)
                 .detailAddress(this.detailAddress)
@@ -56,5 +77,4 @@ public class AddressRequestDto {
                 .isDefault(this.isDefault)
                 .build();
     }
-
 }

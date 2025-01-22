@@ -17,6 +17,8 @@ public class AddressResponseDto {
     private String roadAddress;
     private String detailAddress;
     private String alias;
+    private Boolean isDefault;
+
 
 
 

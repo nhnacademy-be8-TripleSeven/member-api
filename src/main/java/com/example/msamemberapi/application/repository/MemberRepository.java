@@ -22,7 +22,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     boolean existsByEmail(String email);
     boolean existsByUserPhoneNumber(String phoneNumber);
 
-    Page<Member> findByEmailContaining(String email, Pageable pageable);
 
 }
 

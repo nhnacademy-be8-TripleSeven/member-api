@@ -18,6 +18,9 @@ public interface MemberService {
 
     MemberDto join(JoinRequestDto joinRequestDto);
     MemberAuthInfo findByMemberId(String memberId);
+
+    MemberDto getMemberDTOById(Long memberId);
+
     MemberAuthInfo findByMemberId(Long memberId);
     void quitMember(Long memberId);
     MemberAccountInfo getMemberAccountByPhoneNumber(String phoneNumber);
@@ -30,23 +33,28 @@ public interface MemberService {
 
 
     MemberDto getMember(Long id);
-    void updateMember(Long id, MemberDto memberDto);
+
     void deleteMember(Long id);
 
     MemberDto findMemberInfoByUserId(Long s);
     boolean verifyPassword(Long memberId, String password);
+    MemberDto updateMember(Long userId, MemberDto memberDto);
+    MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
+
 
     MemberGradeDto getMemberGrade(Long memberId);
     List<MemberGradeHistoryDto> getGradeHistory(Long memberId);
+
+
 
     MemberDto getMemberInfo(Long userId);
     void saveMember(Member member);
 
     Member getMemberById(Long userId);
 
-
-    MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
-
     @Transactional
     void updateMemberGrade();
+
+//
+//    List<MemberDto> searchMembersByName(String userName, Pageable pageable);
 }

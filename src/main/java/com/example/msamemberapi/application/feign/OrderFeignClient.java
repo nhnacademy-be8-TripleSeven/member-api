@@ -11,4 +11,5 @@ public interface OrderFeignClient {
 
     @GetMapping("/orders/amount/net")
     Long getNetAmount(@RequestParam Long userId);
+
 }

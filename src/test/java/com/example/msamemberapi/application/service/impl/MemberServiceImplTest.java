@@ -1,19 +1,32 @@
 package com.example.msamemberapi.application.service.impl;
 
+import com.example.msamemberapi.application.dto.request.AddressRequestDto;
+import com.example.msamemberapi.application.dto.request.GradeUpdateRequestDto;
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
+import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
+import com.example.msamemberapi.application.dto.response.MemberDto;
+import com.example.msamemberapi.application.dto.response.MemberGradeDto;
+import com.example.msamemberapi.application.entity.Address;
 import com.example.msamemberapi.application.entity.GradePolicy;
 import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
+import com.example.msamemberapi.application.entity.User;
 import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.Gender;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.feign.OrderFeignClient;
+import com.example.msamemberapi.application.repository.AddressRepository;
 import com.example.msamemberapi.application.repository.GradePolicyRepository;
 import com.example.msamemberapi.application.repository.MemberRepository;
+import com.example.msamemberapi.application.service.AddressService;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +34,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +44,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.delete;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 class MemberServiceImplTest {
 
@@ -44,6 +64,14 @@ class MemberServiceImplTest {
     @Mock
     private GradePolicyRepository gradePolicyRepository;
 
+    @Mock
+    private AddressRepository addressRepository;
+
+    @Mock
+    private AddressService addressService;
+
+    @Mock
+    private OrderFeignClient orderFeignClient;
 
     @BeforeEach
     void setUp() {
@@ -58,7 +86,7 @@ class MemberServiceImplTest {
                 new Date(), Gender.MALE);
 
         GradePolicy gradePolicy = GradePolicy.builder()
-                .grade(MemberGrade.GOLD) // 예시로 GOLD 등급 설정
+                .grade(MemberGrade.GOLD)
                 .build();
 
         when(gradePolicyRepository.findByGrade(any(MemberGrade.class))).thenReturn(Optional.ofNullable(gradePolicy));
@@ -152,30 +180,14 @@ class MemberServiceImplTest {
         assertEquals(ErrorCode.ACCOUNT_ID_NOT_FOUND, exception.getErrorCode());
     }
 
-//    @Test
-//    @DisplayName("회원 ID로 삭제 성공")
-//    void deleteByMemberId_success() {
-//        // Arrange
-//        Long memberId = 1L;
-//
-//        Member member = Member.builder().id(1L).build();
-//        member.addRole(MemberRole.USER);
-//
-//
-//        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-//
-//        // Act
-//        memberService.quitMember(memberId);
-//
-//        Assertions.assertTrue(member.getRoles().contains(MemberRole.QUIT.toString()));
-//    }
 
     @Test
     @DisplayName("이메일로 회원 계정 정보 조회 성공")
     void getMemberAccountByEmail_success() {
         // Arrange
         String email = "test@example.com";
-        MemberAccount memberAccount = MemberAccount.builder().id("testUser").accountType(AccountType.REGISTERED).build();
+        MemberAccount memberAccount =
+                MemberAccount.builder().id("testUser").accountType(AccountType.REGISTERED).build();
         Member member = Member.builder().email(email).memberAccount(memberAccount).build();
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
 
@@ -196,7 +208,8 @@ class MemberServiceImplTest {
         when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // Act & Assert
-        CustomException exception = assertThrows(CustomException.class, () -> memberService.getMemberAccountByEmail(email));
+        CustomException exception =
+                assertThrows(CustomException.class, () -> memberService.getMemberAccountByEmail(email));
         assertEquals(ErrorCode.EMAIL_NOT_FOUND, exception.getErrorCode());
     }
 
@@ -204,7 +217,8 @@ class MemberServiceImplTest {
     @DisplayName("회원 비밀번호 업데이트 성공")
     void updateMemberPassword_success() {
         // Arrange
-        UpdatePasswordRequestDto updatePasswordRequestDto = new UpdatePasswordRequestDto("nonexistent@example.com", "123456", "newPassword");
+        UpdatePasswordRequestDto updatePasswordRequestDto =
+                new UpdatePasswordRequestDto("nonexistent@example.com", "123456", "newPassword");
         String encodedPassword = "encodedPassword";
         Member member = Member.builder()
                 .email("test@example.com")
@@ -229,12 +243,14 @@ class MemberServiceImplTest {
     @DisplayName("회원 비밀번호 업데이트 시 이메일이 존재하지 않는 경우 예외 발생")
     void updateMemberPassword_emailNotFound_throwsException() {
         // Arrange
-        UpdatePasswordRequestDto updatePasswordRequestDto = new UpdatePasswordRequestDto("nonexistent@example.com", "123456", "newPassword");
+        UpdatePasswordRequestDto updatePasswordRequestDto =
+                new UpdatePasswordRequestDto("nonexistent@example.com", "123456", "newPassword");
 
         when(memberRepository.findByEmail(updatePasswordRequestDto.getEmail())).thenReturn(Optional.empty());
 
         // Act & Assert
-        CustomException exception = assertThrows(CustomException.class, () -> memberService.updateMemberPassword(updatePasswordRequestDto));
+        CustomException exception =
+                assertThrows(CustomException.class, () -> memberService.updateMemberPassword(updatePasswordRequestDto));
         assertEquals(ErrorCode.EMAIL_NOT_FOUND, exception.getErrorCode());
     }
 
@@ -279,7 +295,8 @@ class MemberServiceImplTest {
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
 
         // Act & Assert
-        CustomException exception = assertThrows(CustomException.class, () -> memberService.validateMatchingLoginIdAndEmail(email, loginId));
+        CustomException exception = assertThrows(CustomException.class,
+                () -> memberService.validateMatchingLoginIdAndEmail(email, loginId));
         assertEquals(ErrorCode.BAD_REQUEST, exception.getErrorCode());
     }
 
@@ -307,7 +324,8 @@ class MemberServiceImplTest {
         when(memberRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        CustomException exception = assertThrows(CustomException.class, () -> memberService.updateLastLoggedInAt(userId));
+        CustomException exception =
+                assertThrows(CustomException.class, () -> memberService.updateLastLoggedInAt(userId));
         assertEquals(ErrorCode.BAD_REQUEST, exception.getErrorCode());
     }
 
@@ -321,7 +339,7 @@ class MemberServiceImplTest {
         GradePolicy gradePolicy = GradePolicy.builder()
                 .grade(MemberGrade.GOLD)
                 .min(5000)
-                .rate(30)
+                .rate(BigDecimal.valueOf(30))
                 .build();
 
         when(gradePolicyRepository.findByGrade(any(MemberGrade.class))).thenReturn(Optional.of(gradePolicy));
@@ -339,5 +357,237 @@ class MemberServiceImplTest {
         assertEquals("chan", result.getName());
         verify(memberRepository, times(1)).save(any(Member.class));
     }
+
+    @Test
+    @DisplayName("회원 비밀번호 검증 성공")
+    void verifyPassword_success() {
+        // Arrange
+        Long memberId = 1L;
+        String password = "password123";
+        String encodedPassword = "encodedPassword";
+
+        MemberAccount account = MemberAccount.builder().password(encodedPassword).build();
+        Member member = Member.builder().memberAccount(account).build();
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
+
+        // Act
+        boolean result = memberService.verifyPassword(memberId, password);
+
+        // Assert
+        assertTrue(result);
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+
+
+    @Test
+    @DisplayName("회원 정보 업데이트 성공")
+    void updateMember_success() {
+        // Arrange
+        Long userId = 1L;
+        MemberDto memberDto = MemberDto.builder()
+                .email("updated@example.com")
+                .phoneNumber("01098765432")
+                .build();
+
+        Member member = Member.builder()
+                .email("original@example.com")
+                .phone("01012345678")
+                .build();
+
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+        when(memberRepository.save(any(Member.class))).thenReturn(member);
+
+        // Act
+        MemberDto result = memberService.updateMember(userId, memberDto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("updated@example.com", result.getEmail());
+        verify(memberRepository, times(1)).save(member);
+    }
+
+    @Test
+    @DisplayName("회원 등급 조회 테스트")
+    void getMemberGrade_success() {
+        // Arrange
+        Long memberId = 1L;
+        Member member = Member.builder().id(memberId).memberGrade(MemberGrade.REGULAR).build();
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        GradePolicy currentGrade = GradePolicy.builder()
+                .grade(MemberGrade.REGULAR).min(0).max(10000)
+                .build();
+        GradePolicy nextGrade = GradePolicy.builder()
+                .grade(MemberGrade.GOLD).min(10000).max(20000)
+                .build();
+
+        when(gradePolicyRepository.findCurrentGrade(anyInt())).thenReturn(currentGrade);
+        when(gradePolicyRepository.findNextGrade(anyInt())).thenReturn(nextGrade);
+
+        // Act
+        MemberGradeDto result = memberService.getMemberGrade(memberId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("REGULAR", result.getCurrentGrade());
+        assertEquals("GOLD", result.getNextGrade());
+        verify(gradePolicyRepository, times(1)).findCurrentGrade(anyInt());
+    }
+
+
+    @Test
+    @DisplayName("회원 조회 실패 - 존재하지 않는 회원")
+    void getMember_notFound() {
+        // Arrange
+        Long userId = 1L;
+        when(memberRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(CustomException.class, () -> memberService.getMember(userId));
+    }
+
+    @Test
+    @DisplayName("회원 삭제 성공")
+    void deleteMember_success() {
+        // Arrange
+        Long memberId = 1L;
+        when(memberRepository.existsById(memberId)).thenReturn(true);
+
+        // Act
+        memberService.deleteMember(memberId);
+
+        // Assert
+        verify(memberRepository, times(1)).deleteById(memberId);
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 회원 없음")
+    void deleteMember_notFound() {
+        // Arrange
+        Long memberId = 1L;
+        when(memberRepository.existsById(memberId)).thenReturn(false);
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> memberService.deleteMember(memberId));
+        assertEquals("Member not found with id: " + memberId, exception.getMessage());
+    }
+    @Test
+    @DisplayName("회원 등급 업데이트 성공")
+    void updateMemberGrade_success() {
+        // Arrange
+        Member member = Member.builder()
+                .id(1L)
+                .memberGrade(MemberGrade.REGULAR)
+                .build();
+
+        GradePolicy gradePolicy = GradePolicy.builder()
+                .min(0)
+                .max(50000)
+                .grade(MemberGrade.GOLD)
+                .build();
+
+        List<Member> members = List.of(member);
+
+        // Mock 설정
+        when(memberRepository.findAll()).thenReturn(members);
+        when(orderFeignClient.getNetAmount(1L)).thenReturn(30000L); // 소비 금액 Mock 설정
+        when(gradePolicyRepository.findAll()).thenReturn(List.of(gradePolicy)); // 등급 정책 Mock 설정
+
+        // Act
+        memberService.updateMemberGrade();
+
+        // Assert
+        assertEquals(MemberGrade.GOLD, member.getMemberGrade()); // 회원 등급 업데이트 확인
+        verify(memberRepository, times(1)).findAll(); // 회원 조회 호출 검증
+        verify(orderFeignClient, times(1)).getNetAmount(1L); // 소비 금액 호출 검증
+    }
+
+    @Test
+    @DisplayName("회원 ID로 회원 조회 성공")
+    void getMember_success() {
+        // Arrange
+        Long memberId = 1L;
+
+        User user = User.builder()
+                .name("Test User")
+                .phoneNumber("01012345678")
+                .points(100)
+                .membership(MemberGrade.REGULAR)
+                .build();
+
+        // Member 객체 생성 및 설정
+        Member member = Member.builder()
+                .id(memberId)
+                .email("test@example.com")
+                .user(user) // User 설정
+                .build();
+
+        // Mock 설정
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        // Act
+        MemberDto result = memberService.getMember(memberId);
+
+        // Assert
+        assertNotNull(result); // 결과가 null이 아님을 확인
+        assertEquals("test@example.com", result.getEmail()); // 이메일 확인
+        assertEquals(100, result.getPoints()); // 포인트 확인
+        verify(memberRepository, times(1)).findById(memberId); // ID로 조회 호출 검증
+    }
+
+    @Test
+    @DisplayName("전화번호로 회원 계정 조회 성공")
+    void getMemberAccountByPhoneNumber_success() {
+        // Arrange
+        String phoneNumber = "01012345678";
+        MemberAccount memberAccount = MemberAccount.builder()
+                .accountType(AccountType.REGISTERED)
+                .build();
+        Member member = Member.builder()
+                .phone(phoneNumber)
+                .memberAccount(memberAccount)
+                .build();
+
+        when(memberRepository.findByUserPhoneNumber(phoneNumber)).thenReturn(Optional.of(member)); // Mock 설정
+
+        // Act
+        MemberAccountInfo result = memberService.getMemberAccountByPhoneNumber(phoneNumber);
+
+        // Assert
+        assertNotNull(result); // 결과가 null이 아님을 확인
+        verify(memberRepository, times(1)).findByUserPhoneNumber(phoneNumber); // 전화번호로 조회 호출 검증
+    }
+
+
+
+    @Test
+    @DisplayName("회원 정보 조회 성공")
+    void getMemberInfo_success() {
+        // Arrange
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .id(memberId)
+                .email("test@example.com")
+                .user(User.builder().points(100).build())
+                .build();
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        // Act
+        MemberDto result = memberService.getMemberInfo(memberId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("test@example.com", result.getEmail());
+        assertEquals(100, result.getPoints());
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+
+
 
 }

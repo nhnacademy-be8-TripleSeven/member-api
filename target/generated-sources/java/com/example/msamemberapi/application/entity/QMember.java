@@ -24,6 +24,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath address = createString("address");
 
+    public final ListPath<Address, QAddress> addresses = this.<Address, QAddress>createList("addresses", Address.class, QAddress.class, PathInits.DIRECT2);
+
     public final DateTimePath<java.util.Date> birth = createDateTime("birth", java.util.Date.class);
 
     public final StringPath detailAddress = createString("detailAddress");
@@ -38,9 +40,13 @@ public class QMember extends EntityPathBase<Member> {
 
     public final QMemberAccount memberAccount;
 
+    public final ListPath<MemberAddress, QMemberAddress> memberAddresses = this.<MemberAddress, QMemberAddress>createList("memberAddresses", MemberAddress.class, QMemberAddress.class, PathInits.DIRECT2);
+
     public final EnumPath<com.example.msamemberapi.application.enums.MemberGrade> memberGrade = createEnum("memberGrade", com.example.msamemberapi.application.enums.MemberGrade.class);
 
     public final StringPath name = createString("name");
+
+    public final StringPath password = createString("password");
 
     public final StringPath phone = createString("phone");
 

@@ -2,6 +2,7 @@ package com.example.msamemberapi.application.dto.response;
 
 import com.example.msamemberapi.application.entity.GradePolicy;
 import com.example.msamemberapi.application.enums.MemberGrade;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.Builder;
 public class MemberGradeDto {
     private Long id;
     private String name;
-    private int rate;     // 적립률
+    private BigDecimal rate;
     private String description;
     private MemberGrade grade;
     private double points;
@@ -23,7 +24,10 @@ public class MemberGradeDto {
     private int currentSpending;
     private int requiredForNextGrade;
 
-    public MemberGradeDto(Long id, String name, int rate, String description, MemberGrade memberGrade, double points) {
+    private int max;
+    private int min;
+
+    public MemberGradeDto(Long id, String name, BigDecimal rate, String description, MemberGrade memberGrade, double points) {
         this.id = id;
         this.name = name;
         this.rate = rate;
@@ -33,11 +37,13 @@ public class MemberGradeDto {
 
     }
 
+    
+
     public static MemberGradeDto from(MemberGrade grade, double points) {
         return new MemberGradeDto(
                 null,
                 grade.name(),
-                0,
+                BigDecimal.valueOf(0),
                 grade.toString(),
                 grade,
                 points

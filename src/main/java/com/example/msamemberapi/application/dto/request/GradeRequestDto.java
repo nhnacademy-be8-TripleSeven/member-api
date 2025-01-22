@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.dto.request;
 
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +21,12 @@ public class GradeRequestDto {
     private String description;
 
     @NotNull
-    private int rate;
+    private BigDecimal rate;
 
     @NotNull
     private int min;
+
+    @NotNull
+    private int max;
+
 }

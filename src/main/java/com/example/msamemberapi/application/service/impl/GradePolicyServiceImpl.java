@@ -57,12 +57,12 @@ public class GradePolicyServiceImpl implements GradePolicyService {
     }
 
     @Override
-    public MemberGradeDto createGrade(String name, MemberGrade memberGrade, String description, int rate, int min) {
+    public MemberGradeDto createGrade(String name, MemberGrade memberGrade, String description, BigDecimal rate, int min, int max) {
         if (gradePolicyRepository.existsByName(name)) {
             throw new IllegalArgumentException("등급 이름이 이미 존재합니다.");
         }
 
-        GradePolicy gradePolicy = GradePolicy.addGradePolicy(name, memberGrade, description, rate, min);
+        GradePolicy gradePolicy = GradePolicy.addGradePolicy(name, memberGrade, description, rate, min,max);
         GradePolicy savedGradePolicy = gradePolicyRepository.save(gradePolicy);
 
         return new MemberGradeDto(
@@ -78,7 +78,7 @@ public class GradePolicyServiceImpl implements GradePolicyService {
     @Override
     @Transactional
     public MemberGradeDto updateGrade(Long id, MemberGrade memberGrade) {
-        // GradePolicy 조회
+
         GradePolicy gradePolicy = gradePolicyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("등급을 찾을 수 없습니다."));
 
@@ -90,12 +90,12 @@ public class GradePolicyServiceImpl implements GradePolicyService {
                 .description(gradePolicy.getDescription())
                 .rate(gradePolicy.getRate())
                 .min(gradePolicy.getMin())
+                .max(gradePolicy.getMax())
                 .build();
 
-        // 저장
+
         gradePolicyRepository.save(updatedGradePolicy);
 
-        // MemberGradeDto 반환
         return new MemberGradeDto(
                 updatedGradePolicy.getId(),
                 updatedGradePolicy.getName(),
@@ -129,5 +129,7 @@ public class GradePolicyServiceImpl implements GradePolicyService {
 
         return rate.multiply(BigDecimal.valueOf(amount)).longValue();
     }
+
+
 
 }
