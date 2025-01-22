@@ -47,24 +47,14 @@ public class MemberManageController {
         return memberService.getMembers(name, memberGrade, pageable);
     }
 
-    @Operation(summary = "멤버 이름으로 검색한 리스트 조회", description = "검색한 문자열이 포함된 이름을 가진 멤버의 리스트 반환. 페이징 지원")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "멤버 리스트 반환"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
-    })
-    @GetMapping("/name/{userName}")
-    public List<MemberDto> searchMembersByName(@PathVariable String userName, Pageable pageable) {
-        return null;
-    }
-
-    @Operation(summary = "멤버 이메일로 검색한 리스트 조회", description = "검색한 문자열이 포함된 이메일을 가진 멤버의 리스트 반환. 페이징 지원")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "멤버 리스트 반환"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
-    })
-    @GetMapping("/email/{userEmail}")
-    public List<MemberDto> searchMembersByEmail(@PathVariable String userEmail, Pageable pageable) {
-        return null;
-    }
-
+//    @Operation(summary = "멤버 이름으로 검색한 리스트 조회", description = "검색한 문자열이 포함된 이름을 가진 멤버의 리스트 반환. 페이징 지원")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "멤버 리스트 반환"),
+//            @ApiResponse(responseCode = "403", description = "권한 없음")
+//    })
+//
+//    @GetMapping("/name/{userName}")
+//    public List<MemberDto> searchMembersByName(@PathVariable String userName, Pageable pageable) {
+//        return memberService.searchMembersByName(userName, pageable);
+//    }
 }
