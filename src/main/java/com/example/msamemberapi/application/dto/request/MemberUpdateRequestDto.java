@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.dto.request;
 
 import com.example.msamemberapi.application.dto.response.MemberDto;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class MemberUpdateRequestDto {
 
     private String email;
-    private String phone;
+    private String phoneNumber;
     private String postcode;
     private String address;
     private String detailAddress;
@@ -24,7 +25,7 @@ public class MemberUpdateRequestDto {
     public MemberDto toMemberDto() {
         return MemberDto.builder()
                 .email(this.email)
-                .phoneNumber(this.phone)
+                .phoneNumber(this.phoneNumber)
                 .postcode(this.postcode)
                 .address(this.address)
                 .detailAddress(this.detailAddress)

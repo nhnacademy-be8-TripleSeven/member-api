@@ -3,6 +3,7 @@ package com.example.msamemberapi.application.service.impl;
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
+import com.example.msamemberapi.application.dto.response.MemberAddressResponseDto;
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.dto.response.MemberGradeDto;
@@ -234,16 +235,18 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
         member.update(
-                memberDto.getEmail(),
-                memberDto.getPhoneNumber(),
-                memberDto.getAddress(),
-                memberDto.getDetailAddress(),
-                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : null
+                memberDto.getEmail() != null ? memberDto.getEmail() : member.getEmail(),
+                memberDto.getPhoneNumber() != null ? memberDto.getPhoneNumber() : member.getPhone(),
+                memberDto.getAddress() != null ? memberDto.getAddress() : member.getAddress(),
+                memberDto.getDetailAddress() != null ? memberDto.getDetailAddress() : member.getDetailAddress(),
+                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : member.getPassword()
         );
 
-        memberRepository.save(member);
-        return MemberDto.fromEntity(member);
+        Member updatedMember = memberRepository.save(member);
+        return MemberDto.fromEntity(updatedMember);
     }
+
+    
     @Override
     public void deleteMember(Long id) {
         if (!memberRepository.existsById(id)) {
@@ -278,7 +281,26 @@ public class MemberServiceImpl implements MemberService {
     public MemberDto findMemberInfoByUserId(Long userId) {
         Member member = memberRepository.findByMemberAccount_Id(String.valueOf(userId))
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
-        return new MemberDto(member);
+
+        List<MemberAddressResponseDto> addressDTOs = member.getAddresses().stream()
+                .map(address -> MemberAddressResponseDto.builder()
+                        .id(address.getId())
+                        .alias(address.getAlias())
+
+                        .roadAddress(address.getRoadAddress())
+                        .detail(address.getDetailAddress())
+                        .postalCode(address.getPostcode())
+                        .isDefault(address.getIsDefault())
+                        .build())
+                .collect(Collectors.toList());
+
+        return MemberDto.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .phoneNumber(member.getPhone())
+                .addresses(addressDTOs)
+                .build();
     }
 
 
@@ -373,5 +395,6 @@ public class MemberServiceImpl implements MemberService {
 
         return false;
     }
+
 }
 

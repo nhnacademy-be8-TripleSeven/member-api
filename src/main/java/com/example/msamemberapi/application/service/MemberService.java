@@ -41,8 +41,11 @@ public interface MemberService {
     MemberDto updateMember(Long userId, MemberDto memberDto);
     MemberDto updateMemberInfo(Long userId, MemberDto memberDto);
 
+
     MemberGradeDto getMemberGrade(Long memberId);
     List<MemberGradeHistoryDto> getGradeHistory(Long memberId);
+
+
 
     MemberDto getMemberInfo(Long userId);
     void saveMember(Member member);
@@ -51,4 +54,7 @@ public interface MemberService {
 
     @Transactional
     void updateMemberGrade();
+
+//
+//    List<MemberDto> searchMembersByName(String userName, Pageable pageable);
 }

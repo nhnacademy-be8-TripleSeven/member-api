@@ -45,6 +45,8 @@ public class Member {
     @Builder.Default
     private List<MemberGradeHistory> gradeHistories = new ArrayList<>();
 
+
+
     private String name;
 
     private String phone;
@@ -91,6 +93,7 @@ public class Member {
 
 
     public void update(String email, String phoneNumber, String address, String detailAddress, String password) {
+
         if (email != null && !email.isBlank()) {
             validateEmail(email);
             this.email = email;

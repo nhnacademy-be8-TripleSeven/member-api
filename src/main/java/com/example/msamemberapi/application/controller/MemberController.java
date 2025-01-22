@@ -94,7 +94,8 @@ public class MemberController {
     @PutMapping("/{userId}/edit")
     public ResponseEntity<MemberDto> updateMember(
             @PathVariable Long userId,
-            @RequestBody @Valid MemberUpdateRequestDto requestDto) {
+            @RequestBody MemberUpdateRequestDto requestDto) {
+        MemberDto memberDto = requestDto.toMemberDto();
         MemberDto updatedMember = memberService.updateMember(userId, requestDto.toMemberDto());
         return ResponseEntity.ok(updatedMember);
     }

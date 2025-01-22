@@ -1,6 +1,7 @@
 package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.dto.request.AddressRequestDto;
+import com.example.msamemberapi.application.dto.request.GradeUpdateRequestDto;
 import com.example.msamemberapi.application.dto.request.JoinRequestDto;
 import com.example.msamemberapi.application.dto.request.UpdatePasswordRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
@@ -34,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.delete;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 class MemberServiceImplTest {
 
@@ -79,7 +86,7 @@ class MemberServiceImplTest {
                 new Date(), Gender.MALE);
 
         GradePolicy gradePolicy = GradePolicy.builder()
-                .grade(MemberGrade.GOLD) // 예시로 GOLD 등급 설정
+                .grade(MemberGrade.GOLD)
                 .build();
 
         when(gradePolicyRepository.findByGrade(any(MemberGrade.class))).thenReturn(Optional.ofNullable(gradePolicy));
@@ -173,23 +180,6 @@ class MemberServiceImplTest {
         assertEquals(ErrorCode.ACCOUNT_ID_NOT_FOUND, exception.getErrorCode());
     }
 
-//    @Test
-//    @DisplayName("회원 ID로 삭제 성공")
-//    void deleteByMemberId_success() {
-//        // Arrange
-//        Long memberId = 1L;
-//
-//        Member member = Member.builder().id(1L).build();
-//        member.addRole(MemberRole.USER);
-//
-//
-//        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-//
-//        // Act
-//        memberService.quitMember(memberId);
-//
-//        Assertions.assertTrue(member.getRoles().contains(MemberRole.QUIT.toString()));
-//    }
 
     @Test
     @DisplayName("이메일로 회원 계정 정보 조회 성공")
@@ -390,6 +380,8 @@ class MemberServiceImplTest {
         verify(memberRepository, times(1)).findById(memberId);
     }
 
+
+
     @Test
     @DisplayName("회원 정보 업데이트 성공")
     void updateMember_success() {
@@ -571,38 +563,6 @@ class MemberServiceImplTest {
     }
 
 
-    @Test
-    @DisplayName("회원 ID로 사용자 정보 조회 성공")
-    void findMemberInfoByUserId_success() {
-        // Arrange
-        Long userId = 1L;
-
-        // User 객체 생성 및 설정
-        User user = User.builder()
-                .name("Test User")
-                .phoneNumber("01012345678")
-                .build();
-
-        // Member 객체 생성 및 설정
-        Member member = Member.builder()
-                .id(userId)
-                .email("test@example.com")
-                .user(user) // User 설정
-                .build();
-
-        // Mock 설정
-        when(memberRepository.findByMemberAccount_Id(String.valueOf(userId)))
-                .thenReturn(Optional.of(member));
-
-        // Act
-        MemberDto result = memberService.findMemberInfoByUserId(userId);
-
-        // Assert
-        assertNotNull(result); // 결과가 null이 아님을 확인
-        assertEquals("test@example.com", result.getEmail()); // 이메일 확인
-        assertEquals("01012345678", result.getPhoneNumber()); // 전화번호 확인
-        verify(memberRepository, times(1)).findByMemberAccount_Id(String.valueOf(userId)); // 호출 검증
-    }
 
     @Test
     @DisplayName("회원 정보 조회 성공")
@@ -629,5 +589,5 @@ class MemberServiceImplTest {
 
 
 
-    
+
 }

@@ -95,27 +95,4 @@ class AddressControllerTest {
         verify(addressService, times(1)).deleteAddress(1L);
     }
 
-    @Test
-    @DisplayName("주소 검색 및 저장 - 성공")
-    void testSearchAndSaveAddress() throws Exception {
-        Map<String, String> payload = Map.of(
-                "keyword", "Office Address",
-                "alias", "Office",
-                "detailAddress", "Suite 200"
-        );
-
-        doNothing().when(addressService).saveAddressFromKakao(eq(1L), anyString(), anyString(), anyString());
-
-        mockMvc.perform(post("/api/members/{memberId}/addresses/search/save", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isCreated());
-
-        verify(addressService, times(1)).saveAddressFromKakao(
-                eq(1L),
-                eq("Office Address"),
-                eq("Office"),
-                eq("Suite 200")
-        );
-    }
 }

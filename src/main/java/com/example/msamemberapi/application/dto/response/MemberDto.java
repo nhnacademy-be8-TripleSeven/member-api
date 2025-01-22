@@ -34,6 +34,8 @@ public class MemberDto {
     private String address;
     private String detailAddress;
     private Integer points;
+    private List<MemberAddressResponseDto> addresses;
+
 
 //
 //    public MemberDto(Member member) {

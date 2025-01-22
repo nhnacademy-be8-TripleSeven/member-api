@@ -9,7 +9,10 @@
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/controller/AddressControllerTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/repository/querydsl/impl/MemberRepositoryCustomImplTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/service/impl/GuestCartServiceTest.java
+/Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/controller/MemberControllerTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/service/impl/AddressServiceImplTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/service/impl/EmailServiceImplTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/service/impl/KakaoAddressServiceImplTest.java
 /Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/service/impl/MemberServiceImplTest.java
+/Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/repository/querydsl/impl/MemberRepositoryTest.java
+/Users/choeeunhwa/Desktop/member-api5/src/test/java/com/example/msamemberapi/application/entity/AddressTest.java

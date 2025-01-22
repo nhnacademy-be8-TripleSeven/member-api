@@ -37,7 +37,6 @@ public class MemberAddressRequestDto {
     @JsonProperty("detailAddress")
     private String detail;
 
-    @NotNull
     @JsonProperty("isDefault") 
     private Boolean isDefault;
 }

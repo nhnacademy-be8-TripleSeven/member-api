@@ -1,5 +1,7 @@
 com/example/msamemberapi/MsaMemberApiApplicationTests.class
+com/example/msamemberapi/application/repository/querydsl/impl/MemberRepositoryTest.class
 com/example/msamemberapi/application/controller/CartControllerTest.class
+com/example/msamemberapi/application/controller/MemberControllerTest.class
 com/example/msamemberapi/application/service/impl/GuestCartServiceTest.class
 com/example/msamemberapi/application/service/impl/MemberCartServiceTest.class
 com/example/msamemberapi/application/controller/MemberAddressControllerTest.class
@@ -12,4 +14,5 @@ com/example/msamemberapi/application/service/impl/KakaoAddressServiceImplTest.cl
 com/example/msamemberapi/application/controller/AddressControllerTest.class
 com/example/msamemberapi/application/service/impl/AddressServiceImplTest.class
 com/example/msamemberapi/application/repository/querydsl/impl/MemberRepositoryCustomImplTest.class
+com/example/msamemberapi/application/entity/EntityTest.class
 com/example/msamemberapi/application/service/impl/MemberAddressServiceImplTest.class
