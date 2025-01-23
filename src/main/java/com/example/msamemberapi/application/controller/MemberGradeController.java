@@ -109,7 +109,7 @@ public class MemberGradeController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @GetMapping("/members/grade/point")
-    public ResponseEntity<Long> getMemberGrade(@RequestParam Long userId,
+    public ResponseEntity<Long> getMemberGrade(@RequestHeader("X-USER") Long userId,
                                                @RequestParam Long amount) {
         Long point = gradePolicyService.calculateMemberGrade(userId, amount);
         return ResponseEntity.ok(point);

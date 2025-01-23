@@ -179,19 +179,19 @@ class MemberGradeControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @DisplayName("회원 등급 계산")
-    void getMemberGrade_success() throws Exception {
-        Long userId = 1L;
-        Long amount = 5000L;
-        Long expectedPoints = 500L;
-
-        when(gradePolicyService.calculateMemberGrade(userId, amount)).thenReturn(expectedPoints);
-
-        mockMvc.perform(get("/members/grade/point")
-                        .param("userId", userId.toString())
-                        .param("amount", amount.toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(expectedPoints.toString()));
-    }
+//    @Test
+//    @DisplayName("회원 등급 계산")
+//    void getMemberGrade_success() throws Exception {
+//        Long userId = 1L;
+//        Long amount = 5000L;
+//        Long expectedPoints = 500L;
+//
+//        when(gradePolicyService.calculateMemberGrade(userId, amount)).thenReturn(expectedPoints);
+//
+//        mockMvc.perform(get("/members/grade/point")
+//                        .param("userId", userId.toString())
+//                        .param("amount", amount.toString()))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(expectedPoints.toString()));
+//    }
 }

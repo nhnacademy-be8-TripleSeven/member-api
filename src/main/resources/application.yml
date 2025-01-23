@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: instance1
   data:
     redis:
       host: 133.186.241.167
