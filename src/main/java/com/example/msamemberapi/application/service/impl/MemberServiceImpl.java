@@ -239,13 +239,13 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
-//        member.update(
-//                memberDto.getEmail() != null ? memberDto.getEmail() : member.getEmail(),
-//                memberDto.getPhoneNumber() != null ? memberDto.getPhoneNumber() : member.getPhone(),
-//                memberDto.getAddress() != null ? memberDto.getAddress() : member.getAddress(),
-//                memberDto.getDetailAddress() != null ? memberDto.getDetailAddress() : member.getDetailAddress(),
-//                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : member.getPassword()
-//        );
+        member.update(
+                memberDto.getEmail() != null ? memberDto.getEmail() : member.getEmail(),
+                memberDto.getPhoneNumber() != null ? memberDto.getPhoneNumber() : member.getPhone(),
+                memberDto.getAddress() != null ? memberDto.getAddress() : member.getAddress(),
+                memberDto.getDetailAddress() != null ? memberDto.getDetailAddress() : member.getDetailAddress(),
+                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : member.getPassword()
+        );
 
         Member updatedMember = memberRepository.save(member);
         return MemberDto.fromEntity(updatedMember);
