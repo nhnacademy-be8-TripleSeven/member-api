@@ -100,7 +100,7 @@ class MemberControllerTest {
         // Arrange
         MemberUpdateRequestDto updateRequest = MemberUpdateRequestDto.builder()
                 .email("newemail@example.com")
-                .phone("010-9876-5432")
+                .phoneNumber("010-9876-5432")
                 .postcode("12345")
                 .address("Seoul")
                 .detailAddress("Gangnam-gu")
@@ -212,5 +212,7 @@ class MemberControllerTest {
 
         assertEquals("Address not found", exception.getMessage());
     }
+
+    
 
 }
