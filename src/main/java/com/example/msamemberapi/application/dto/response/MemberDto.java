@@ -37,16 +37,17 @@ public class MemberDto {
     private List<MemberAddressResponseDto> addresses;
 
 
-//
-//    public MemberDto(Member member) {
-//        this.id = member.getId();
-//        this.email = member.getEmail();
-//        this.phoneNumber = member.getUser().getPhoneNumber();
-//        this.name = member.getUser().getName();
-//        this.birth = member.getBirth();
-//        this.gender = member.getGender().name();
-//        this.memberGrade = member.getMemberGrade().name();
-//    }
+
+    public MemberDto(Member member) {
+        this.id = member.getId();
+        this.email = member.getEmail();
+        this.phoneNumber = member.getUser().getPhoneNumber();
+        this.name = member.getUser().getName();
+        this.birth = member.getBirth();
+        this.gender = member.getGender().name();
+        this.memberGrade = member.getMemberGrade().name();
+        this.points = member.getUser() != null ? member.getUser().getPoints() : 0;
+    }
 
     @QueryProjection
     public MemberDto(Long id, String email, String phoneNumber, String name, Date birth,
@@ -60,16 +61,16 @@ public class MemberDto {
         this.memberGrade = memberGrade != null ? memberGrade.name() : "REGULAR";
     }
 
-    public MemberDto(Member member) {
-        this.id = member.getId();
-        this.email = member.getEmail();
-        this.phoneNumber = member.getUser().getPhoneNumber();
-        this.name = member.getUser().getName();
-        this.birth = member.getBirth();
-        this.gender = member.getGender() != null ? member.getGender().name() : "UNKNOWN";
-        this.memberGrade = member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR";
-        this.points = member.getUser() != null ? member.getUser().getPoints() : 0;
-    }
+//    public MemberDto(Member member) {
+//        this.id = member.getId();
+//        this.email = member.getEmail();
+//        this.phoneNumber = member.getUser().getPhoneNumber();
+//        this.name = member.getUser().getName();
+//        this.birth = member.getBirth();
+//        this.gender = member.getGender() != null ? member.getGender().name() : "UNKNOWN";
+//        this.memberGrade = member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR";
+//        this.points = member.getUser() != null ? member.getUser().getPoints() : 0;
+//    }
 
 
 
@@ -78,19 +79,20 @@ public class MemberDto {
             throw new IllegalArgumentException("Member cannot be null");
         }
 
-        return MemberDto.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .phoneNumber(member.getUser() != null ? member.getUser().getPhoneNumber() : null)
-                .name(member.getUser() != null ? member.getUser().getName() : null)
-                .birth(member.getBirth())
-                .gender(member.getGender() != null ? member.getGender().name() : "UNKNOWN")
-                .memberGrade(member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR")
-                .postcode(member.getPostcode())
-                .address(member.getAddress())
-                .detailAddress(member.getDetailAddress())
-                .password(member.getPassword()) // Include password if needed
-                .points(member.getUser() != null ? member.getUser().getPoints() : 0)
-                .build();
+//        return MemberDto.builder()
+//                .id(member.getId())
+//                .email(member.getEmail())
+//                .phoneNumber(member.getUser() != null ? member.getUser().getPhoneNumber() : null)
+//                .name(member.getUser() != null ? member.getUser().getName() : null)
+//                .birth(member.getBirth())
+//                .gender(member.getGender() != null ? member.getGender().name() : "UNKNOWN")
+//                .memberGrade(member.getMemberGrade() != null ? member.getMemberGrade().name() : "REGULAR")
+//                .postcode(member.getPostcode())
+//                .address(member.getAddress())
+//                .detailAddress(member.getDetailAddress())
+//                .password(member.getPassword()) // Include password if needed
+//                .points(member.getUser() != null ? member.getUser().getPoints() : 0)
+//                .build();
+        return null;
     }
 }

@@ -24,6 +24,7 @@ import com.example.msamemberapi.application.repository.MemberGradeHistoryReposit
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.MemberService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,6 @@ public class MemberServiceImpl implements MemberService {
     private final OrderFeignClient orderFeignClient;
 
 
-
     @Override
     @Transactional
     public MemberDto join(JoinRequestDto joinRequestDto) {
@@ -65,7 +65,6 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
         return new MemberAuthInfo(member);
     }
-
 
 
     @Override
@@ -130,7 +129,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberDTOById(Long memberId) {
-        Optional<Member> member =  memberRepository.findById(memberId);
+        Optional<Member> member = memberRepository.findById(memberId);
         if (member.isEmpty()) {
             throw new CustomException(ErrorCode.BAD_REQUEST);
         }
@@ -156,8 +155,8 @@ public class MemberServiceImpl implements MemberService {
                 .gradeHistories(new ArrayList<>())
                 .build();
 
-        MemberGradeHistory gradeHistory = createMemberGradeHistory(member);
-        member.addGradeHistory(gradeHistory);
+        //MemberGradeHistory gradeHistory = createMemberGradeHistory(member);
+        //member.addGradeHistory(gradeHistory);
         member.addRole(MemberRole.USER);
 
         return member;
@@ -173,8 +172,14 @@ public class MemberServiceImpl implements MemberService {
     private MemberGradeHistory createMemberGradeHistory(Member member) {
         return MemberGradeHistory.builder()
                 .createdAt(LocalDate.now())
-                .gradePolicy(gradePolicyRepository.findByGrade(MemberGrade.ROYAL).orElseThrow(() ->
-                        new CustomException(ErrorCode.GRADE_POLICY_NOT_FOUND)))
+                .gradePolicy(GradePolicy.addGradePolicy(
+                        "일반",
+                        MemberGrade.REGULAR,
+                        "회원 가입",
+                        BigDecimal.valueOf(0.01),
+                        0,
+                        100000
+                ))
                 .member(member)
                 .build();
     }
@@ -210,16 +215,16 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
         User user = member.getUser();
-        return MemberDto.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .email(member.getEmail())
-                .phoneNumber(member.getPhone())
-                .points(user.getPoints())
-                .memberGrade(user.getMembership().name())
-                .build();
+//        return MemberDto.builder()
+//                .id(member.getId())
+//                .name(member.getName())
+//                .email(member.getEmail())
+//                .phoneNumber(member.getPhone())
+//                .points(user.getPoints())
+//                .memberGrade(user.getMembership().name())
+//                .build();
+        return null;
     }
-
 
 
     @Override
@@ -234,19 +239,19 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_ID_NOT_FOUND));
 
-        member.update(
-                memberDto.getEmail() != null ? memberDto.getEmail() : member.getEmail(),
-                memberDto.getPhoneNumber() != null ? memberDto.getPhoneNumber() : member.getPhone(),
-                memberDto.getAddress() != null ? memberDto.getAddress() : member.getAddress(),
-                memberDto.getDetailAddress() != null ? memberDto.getDetailAddress() : member.getDetailAddress(),
-                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : member.getPassword()
-        );
+//        member.update(
+//                memberDto.getEmail() != null ? memberDto.getEmail() : member.getEmail(),
+//                memberDto.getPhoneNumber() != null ? memberDto.getPhoneNumber() : member.getPhone(),
+//                memberDto.getAddress() != null ? memberDto.getAddress() : member.getAddress(),
+//                memberDto.getDetailAddress() != null ? memberDto.getDetailAddress() : member.getDetailAddress(),
+//                memberDto.getPassword() != null ? passwordEncoder.encode(memberDto.getPassword()) : member.getPassword()
+//        );
 
         Member updatedMember = memberRepository.save(member);
         return MemberDto.fromEntity(updatedMember);
     }
 
-    
+
     @Override
     public void deleteMember(Long id) {
         if (!memberRepository.existsById(id)) {
@@ -294,13 +299,14 @@ public class MemberServiceImpl implements MemberService {
                         .build())
                 .collect(Collectors.toList());
 
-        return MemberDto.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .email(member.getEmail())
-                .phoneNumber(member.getPhone())
-                .addresses(addressDTOs)
-                .build();
+//        return MemberDto.builder()
+//                .id(member.getId())
+//                .name(member.getName())
+//                .email(member.getEmail())
+//                .phoneNumber(member.getPhone())
+//                .addresses(addressDTOs)
+//                .build();
+        return null;
     }
 
 
@@ -323,19 +329,19 @@ public class MemberServiceImpl implements MemberService {
                 .requiredForNextGrade(nextGrade != null ? nextGrade.getMin() - spending : 0) // 다음 등급까지 필요한 금액
                 .build();
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<MemberGradeHistoryDto> getGradeHistory(Long memberId) {
-        List<MemberGradeHistory> history = memberGradeHistoryRepository.findByMemberId(memberId);
-
-        return history.stream()
-                .map(record -> MemberGradeHistoryDto.builder()
-                        .gradeName(record.getGradePolicy().getName())
-                        .changedDate(record.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }
+//
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<MemberGradeHistoryDto> getGradeHistory(Long memberId) {
+//        List<MemberGradeHistory> history = memberGradeHistoryRepository.findByMemberId(memberId);
+//
+//        return history.stream()
+//                .map(record -> MemberGradeHistoryDto.builder()
+//                        .gradeName(record.getGradePolicy().getName())
+//                        .changedDate(record.getCreatedAt())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 
     private int calculateSpending(Long memberId) {
 

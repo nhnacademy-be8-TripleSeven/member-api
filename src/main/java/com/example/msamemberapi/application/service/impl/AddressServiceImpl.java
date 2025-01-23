@@ -167,6 +167,8 @@ public class AddressServiceImpl implements AddressService {
                 .isDefault(requestDto.getIsDefault() != null && requestDto.getIsDefault())
                 .build();
         memberAddressRepository.save(memberAddress);
+        member.getMemberAddresses().add(memberAddress);
+        memberRepository.save(member);
 
         // 6. 기본 주소 설정 처리
         if (Boolean.TRUE.equals(requestDto.getIsDefault())) {
