@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: instance1
+    active: dev
   data:
     redis:
       host: 133.186.241.167
@@ -78,3 +78,8 @@ logging:
   level:
     web: debug
 
+
+
+kakao:
+  api:
+    key: a647f3b0334d3e5914bdff0748674f64

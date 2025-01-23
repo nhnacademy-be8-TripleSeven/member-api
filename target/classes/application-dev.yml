@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate.format_sql: true
@@ -36,6 +36,3 @@ eureka:
       defaultZone: http://admin:1234@localhost:8761/eureka/
 
 
-kakao:
-  api:
-    key: a647f3b0334d3e5914bdff0748674f64

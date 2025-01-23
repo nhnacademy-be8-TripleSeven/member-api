@@ -43,7 +43,6 @@ public interface MemberService {
 
 
     MemberGradeDto getMemberGrade(Long memberId);
-    List<MemberGradeHistoryDto> getGradeHistory(Long memberId);
 
 
 
