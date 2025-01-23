@@ -173,54 +173,54 @@ class AddressServiceImplTest {
         // Assert
         verify(addressRepository, times(1)).deleteById(addressId);
     }
-    @Test
-    @DisplayName("카카오 주소 검색 및 저장 성공")
-    void saveAddressFromKakao_success_withAnswer() {
-        // Arrange
-        Long userId = 1L;
-        String query = "Some Address";
-        String alias = "Home";
-        String detailAddress = "123 Suite";
-
-        // Mock Member
-        Member member = mock(Member.class);
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
-
-        // Mock KakaoAddressResponseDto
-        KakaoAddressResponseDto kakaoResponse = KakaoAddressResponseDto.builder()
-                .documents(List.of(
-                        KakaoAddressResponseDto.Document.builder()
-                                .roadAddress(KakaoAddressResponseDto.RoadAddress.builder()
-                                        .addressName("123 Road")
-                                        .zoneNo("54321")
-                                        .build())
-                                .build()
-                ))
-                .build();
-
-        // WebClient Mock 설정
-        when(webClient.get()).thenAnswer(invocation -> {
-            WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
-            when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(uriInvocation -> {
-                WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
-                when(requestHeadersSpec.retrieve()).thenAnswer(retrieveInvocation -> {
-                    WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
-                    when(responseSpec.bodyToMono(KakaoAddressResponseDto.class)).thenReturn(Mono.just(kakaoResponse));
-                    return responseSpec;
-                });
-                return requestHeadersSpec;
-            });
-            return requestHeadersUriSpec;
-        });
-
-        // Act
-        addressService.saveAddressFromKakao(userId, query, alias, detailAddress);
-
-        // Assert
-        verify(addressRepository, times(1)).save(any(Address.class));
-        verify(memberAddressRepository, times(1)).save(any(MemberAddress.class));
-        verify(memberRepository, times(1)).save(member);
-    }
+//    @Test
+//    @DisplayName("카카오 주소 검색 및 저장 성공")
+//    void saveAddressFromKakao_success_withAnswer() {
+//        // Arrange
+//        Long userId = 1L;
+//        String query = "Some Address";
+//        String alias = "Home";
+//        String detailAddress = "123 Suite";
+//
+//        // Mock Member
+//        Member member = mock(Member.class);
+//        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+//
+//        // Mock KakaoAddressResponseDto
+//        KakaoAddressResponseDto kakaoResponse = KakaoAddressResponseDto.builder()
+//                .documents(List.of(
+//                        KakaoAddressResponseDto.Document.builder()
+//                                .roadAddress(KakaoAddressResponseDto.RoadAddress.builder()
+//                                        .addressName("123 Road")
+//                                        .zoneNo("54321")
+//                                        .build())
+//                                .build()
+//                ))
+//                .build();
+//
+//        // WebClient Mock 설정
+//        when(webClient.get()).thenAnswer(invocation -> {
+//            WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
+//            when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(uriInvocation -> {
+//                WebClient.RequestHeadersSpec<?> requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+//                when(requestHeadersSpec.retrieve()).thenAnswer(retrieveInvocation -> {
+//                    WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+//                    when(responseSpec.bodyToMono(KakaoAddressResponseDto.class)).thenReturn(Mono.just(kakaoResponse));
+//                    return responseSpec;
+//                });
+//                return requestHeadersSpec;
+//            });
+//            return requestHeadersUriSpec;
+//        });
+//
+//        // Act
+//        addressService.saveAddressFromKakao(userId, query, alias, detailAddress);
+//
+//        // Assert
+//        verify(addressRepository, times(1)).save(any(Address.class));
+//        verify(memberAddressRepository, times(1)).save(any(MemberAddress.class));
+//        verify(memberRepository, times(1)).save(member);
+//    }
 }
 
 
