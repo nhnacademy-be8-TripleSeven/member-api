@@ -3,7 +3,7 @@ spring:
     active: dev
   data:
     redis:
-      host: 133.186.241.167
+      host: s4.java21.net
       port: 6379
       password: "*N2vya7H@muDTwdNMR!"
       database: 222
@@ -50,22 +50,6 @@ management:
     env:
       enabled: true
 
-secret:
-  url: https://api-keymanager.nhncloudservice.com
-  appKey: qTQNj7LyHhdAazH3
-  keys:
-    db:
-      url: 50cec4261dc94323ab8e3d6a44412ab4
-      username: aaf3edf33ca847e3ac72361613ee1784
-      password: 23b0d6961e204d59a645d662f6843f25
-
-    email:
-      account: 105936ae31de41628611ecbd5e08476c
-      password: d2a9fc886fc84e208b8d5d44268f3f10
-    auth:
-      value: 452fd78c768c4bffa03d8486b1dcf5be
-  keyStoreFilePath: triple-seven.p12
-  password: nhn24
 
 server:
   shutdown: graceful

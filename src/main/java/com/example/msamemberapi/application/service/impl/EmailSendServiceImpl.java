@@ -3,7 +3,6 @@ package com.example.msamemberapi.application.service.impl;
 import com.example.msamemberapi.application.error.CustomException;
 import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.service.EmailSendService;
-import com.example.msamemberapi.common.annotations.secure.SecureKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -20,10 +19,8 @@ import java.util.Properties;
 @RequiredArgsConstructor
 public class EmailSendServiceImpl implements EmailSendService {
 
-    @SecureKey("secret.keys.email.account")
-    private String USERNAME;
-    @SecureKey("secret.keys.email.password")
-    private String PASSWORD;
+    private String USERNAME = "tlswlfk@gmail.com";
+    private String PASSWORD = "hgadoqeeqdxhawmo";
     private final Session EMAIL_SESSION = createEmailSession();
 
     @Override

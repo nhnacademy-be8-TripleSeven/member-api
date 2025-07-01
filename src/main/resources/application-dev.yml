@@ -4,20 +4,20 @@ server:
 spring:
   data:
     redis:
-      host: localhost
+      host: s4.java21.net
       port: 6379
-      database: 0
+      database: 222
   datasource:
-    url: jdbc:mysql://localhost:3306/msamemberapi?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: 12345
+    url: jdbc:mysql://s4.java21.net:13306/project_be8_triple_seven_member?serverTimezone=UTC&characterEncoding=UTF-8
+    username: project_be8_triple_seven
+    password: eo1cItEUe@J2Tym
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: org.apache.commons.dbcp2.BasicDataSource
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
@@ -33,6 +33,6 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://admin:1234@localhost:8761/eureka/
+      defaultZone: http://admin:1234@localhost:10138/eureka/
 
 
