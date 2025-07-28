@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CompletableFuture;
+
 @Tag(name = "Member-Account", description = "계정 Api")
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class AccountController {
 
     private final MemberService memberService;
     private final BookFeignClient bookFeignClient;
+    private final CouponService couponService;
     private final EmailService emailService;
 
     @Operation(summary = "멤버 생성", description = "회원가입 시 받은 정보로 멤버 생성")
@@ -38,7 +41,7 @@ public class AccountController {
     public ResponseEntity<Void> create(@Valid @RequestBody JoinRequestDto joinRequestDto) {
         emailService.validateEmailIsVerified(joinRequestDto.getEmail());
         MemberDto memberDto = memberService.join(joinRequestDto);
-        bookFeignClient.createWelcomeCoupon(memberDto.getId());
+        couponService.issueWelcomeCoupon(memberDto.getId()); // 웰컴쿠폰 발급을 비동기 처리
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
