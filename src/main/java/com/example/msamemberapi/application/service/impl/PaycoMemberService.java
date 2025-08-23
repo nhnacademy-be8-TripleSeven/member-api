@@ -3,8 +3,6 @@ package com.example.msamemberapi.application.service.impl;
 import com.example.msamemberapi.application.dto.request.Oauth2MemberRequestDto;
 import com.example.msamemberapi.application.dto.response.MemberAccountInfo;
 import com.example.msamemberapi.application.entity.Member;
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.Oauth2MemberService;
 import lombok.RequiredArgsConstructor;

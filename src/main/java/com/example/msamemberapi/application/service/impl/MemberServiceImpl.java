@@ -7,7 +7,6 @@ import com.example.msamemberapi.application.dto.response.MemberAddressResponseDt
 import com.example.msamemberapi.application.dto.response.MemberAuthInfo;
 import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.dto.response.MemberGradeDto;
-import com.example.msamemberapi.application.dto.response.MemberGradeHistoryDto;
 import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.entity.MemberAccount;
 import com.example.msamemberapi.application.entity.MemberGradeHistory;
@@ -16,8 +15,8 @@ import com.example.msamemberapi.application.entity.User;
 import com.example.msamemberapi.application.enums.AccountType;
 import com.example.msamemberapi.application.enums.MemberGrade;
 import com.example.msamemberapi.application.enums.MemberRole;
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.error.application.CustomException;
+import com.example.msamemberapi.application.error.application.ErrorCode;
 import com.example.msamemberapi.application.feign.OrderFeignClient;
 import com.example.msamemberapi.application.repository.GradePolicyRepository;
 import com.example.msamemberapi.application.repository.MemberGradeHistoryRepository;

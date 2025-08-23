@@ -2,8 +2,8 @@ package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.entity.Member;
 import com.example.msamemberapi.application.enums.MemberRole;
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.error.application.CustomException;
+import com.example.msamemberapi.application.error.application.ErrorCode;
 import com.example.msamemberapi.application.repository.MemberRepository;
 import com.example.msamemberapi.application.service.EmailSendService;
 import com.example.msamemberapi.application.service.EmailService;

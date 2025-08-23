@@ -2,8 +2,8 @@ package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.dto.response.BookDetailResponseDto;
 import com.example.msamemberapi.application.dto.response.CartDto;
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.error.application.CustomException;
+import com.example.msamemberapi.application.error.application.ErrorCode;
 import com.example.msamemberapi.application.feign.BookFeignClient;
 import com.example.msamemberapi.application.service.CartService;
 import lombok.RequiredArgsConstructor;

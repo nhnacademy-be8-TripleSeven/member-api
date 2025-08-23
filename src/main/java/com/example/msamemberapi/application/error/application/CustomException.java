@@ -1,4 +1,4 @@
-package com.example.msamemberapi.application.error;
+package com.example.msamemberapi.application.error.application;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

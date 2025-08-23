@@ -1,17 +1,10 @@
 package com.example.msamemberapi.application.controller;
 
-import com.example.msamemberapi.application.dto.request.AddressRequestDto;
 import com.example.msamemberapi.application.dto.request.GradeUpdateRequestDto;
 import com.example.msamemberapi.application.dto.request.MemberUpdateRequestDto;
-import com.example.msamemberapi.application.dto.response.AddressResponseDto;
 import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.dto.response.MemberGradeDto;
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.entity.Address;
-import com.example.msamemberapi.application.entity.Member;
-import com.example.msamemberapi.application.entity.MemberDetails;
 import com.example.msamemberapi.application.enums.MemberGrade;
-import com.example.msamemberapi.application.error.ErrorCode;
 import com.example.msamemberapi.application.service.AddressService;
 import com.example.msamemberapi.application.service.GradePolicyService;
 import com.example.msamemberapi.application.service.MemberService;
@@ -19,14 +12,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import java.util.List;
+
 import java.util.Map;
-import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

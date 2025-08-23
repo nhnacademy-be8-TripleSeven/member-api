@@ -1,7 +1,7 @@
 package com.example.msamemberapi.application.service.impl;
 
-import com.example.msamemberapi.application.error.CustomException;
-import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.error.application.CustomException;
+import com.example.msamemberapi.application.error.application.ErrorCode;
 import com.example.msamemberapi.application.service.EmailSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

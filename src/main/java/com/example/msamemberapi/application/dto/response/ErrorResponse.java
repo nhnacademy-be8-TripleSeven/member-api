@@ -1,10 +1,9 @@
 package com.example.msamemberapi.application.dto.response;
 
-import com.example.msamemberapi.application.error.ErrorCode;
+import com.example.msamemberapi.application.error.application.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
