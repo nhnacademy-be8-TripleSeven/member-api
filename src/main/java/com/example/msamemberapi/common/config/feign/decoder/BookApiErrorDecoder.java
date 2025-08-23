@@ -6,10 +6,12 @@ import com.example.msamemberapi.application.error.application.ErrorCode;
 import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Component
 public class BookApiErrorDecoder implements ErrorDecoder {
 
     private final ErrorDecoder defaultErrorDecoder = new ErrorDecoder.Default();
