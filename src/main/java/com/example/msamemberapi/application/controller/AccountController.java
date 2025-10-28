@@ -8,6 +8,7 @@ import com.example.msamemberapi.application.dto.response.MemberDto;
 import com.example.msamemberapi.application.feign.BookFeignClient;
 import com.example.msamemberapi.application.service.EmailService;
 import com.example.msamemberapi.application.service.MemberService;
+import com.example.msamemberapi.application.service.impl.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Member-Account", description = "계정 Api")
 @RestController

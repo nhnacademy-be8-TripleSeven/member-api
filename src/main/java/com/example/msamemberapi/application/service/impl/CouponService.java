@@ -1,4 +1,4 @@
-package com.example.msamemberapi.application.controller;
+package com.example.msamemberapi.application.service.impl;
 
 import com.example.msamemberapi.application.feign.BookFeignClient;
 import lombok.RequiredArgsConstructor;
